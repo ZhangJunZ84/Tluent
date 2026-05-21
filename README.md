@@ -12,6 +12,7 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Dropdown Search
 - [x] Auto Save Config
 - [x] SetTitle and SetSubtitle
+- [x] Tab Style (Tabs/Icons)
 
 ### To-do
 - [ ] Style Overhaul

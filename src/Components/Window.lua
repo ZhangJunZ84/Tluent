@@ -25,6 +25,7 @@ return function(Config)
 		Size = Config.Size,
 		CurrentPos = 0,
 		TabWidth = 0,
+		TabStyle = Config.TabStyle or "Tabs",
 		Position = UDim2.fromOffset(
 			Camera.ViewportSize.X / 2 - Config.Size.X.Offset / 2,
 			Camera.ViewportSize.Y / 2 - Config.Size.Y.Offset / 2
@@ -36,7 +37,8 @@ return function(Config)
 	local MinimizeNotif = false
 
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
-	Window.TabWidth = Config.TabWidth
+	local DefaultTabWidth = Window.TabStyle == "Icons" and 36 or 120
+	Window.TabWidth = Config.TabWidth or DefaultTabWidth
 
 	local Selector = New("Frame", {
 		Size = UDim2.fromOffset(4, 0),

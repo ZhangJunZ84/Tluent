@@ -6,7 +6,8 @@ local Window = Fluent:CreateWindow({
     Title = "Title " .. Fluent.Version,
     SubTitle = "subtitle",
     SubTitlePosition = "Side", -- "Below" or "Side" (default)
-    TabWidth = 100,
+    TabStyle = "Tabs", -- "Tabs" or "Icons"
+    TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
     Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
     Theme = "Dark",
@@ -15,7 +16,7 @@ local Window = Fluent:CreateWindow({
 
 --Fluent provides Lucide Icons https://lucide.dev/icons/ for the tabs, icons are optional
 local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "box" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 

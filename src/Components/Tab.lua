@@ -49,6 +49,8 @@ function TabModule:New(Title, Icon, Parent)
 		Icon = nil
 	end
 
+	local IsIconMode = Window.TabStyle == "Icons"
+
 	Tab.Frame = New("TextButton", {
 		Size = UDim2.new(1, 0, 0, 34),
 		BackgroundTransparency = 1,
@@ -60,7 +62,7 @@ function TabModule:New(Title, Icon, Parent)
 		New("UICorner", {
 			CornerRadius = UDim.new(0, 6),
 		}),
-		New("TextLabel", {
+		not IsIconMode and New("TextLabel", {
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = Icon and UDim2.new(0, 30, 0.5, 0) or UDim2.new(0, 12, 0.5, 0),
 			Text = Title,
@@ -80,11 +82,11 @@ function TabModule:New(Title, Icon, Parent)
 			ThemeTag = {
 				TextColor3 = "Text",
 			},
-		}),
+		}) or nil,
 		New("ImageLabel", {
-			AnchorPoint = Vector2.new(0, 0.5),
+			AnchorPoint = IsIconMode and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5),
 			Size = UDim2.fromOffset(16, 16),
-			Position = UDim2.new(0, 8, 0.5, 0),
+			Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0),
 			BackgroundTransparency = 1,
 			Image = Icon and Icon or nil,
 			ThemeTag = {
