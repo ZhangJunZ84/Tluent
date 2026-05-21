@@ -1,18 +1,18 @@
 {
-  "name": "fluentlibrary",
-  "version": "1.0.0",
+  "name": "tluentlibrary",
+  "version": "0.0.1",
   "description": "",
   "main": "init.lua",
   "scripts": {
     "rojo": "mkdirp dist && rojo build -o dist/main.rbxm",
     "bundle": "pnpm run rojo && lune build",
     "build": "powershell -ExecutionPolicy Bypass -File build.ps1",
-    "live": "python -m http.server 8642",
+    "live": "mkdirp dist && python -m http.server 8642",
     "watch": "chokidar \"src\" -c \"npm run build\"",
-    "live-build": "concurrently \"npm run live\" \"npm run watch\""
+    "live-build": "npm run build && concurrently \"npm run live\" \"npm run watch\""
   },
   "keywords": [],
-  "author": "dawid",
+  "author": "TWVZ",
   "license": "MIT",
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
