@@ -10,9 +10,10 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Section Position
 - [x] Paragraph Text Position
 - [x] Dropdown Search
+- [x] Auto Save Config
+- [x] SetTitle and SetSubtitle
 
 ### To-do
-- [ ] Auto Save Config
 - [ ] Style Overhaul
 - [ ] More Icons
 - [ ] More Themes

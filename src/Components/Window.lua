@@ -384,6 +384,14 @@ return function(Config)
 		return self.TitleBar:AddTag(Config)
 	end
 
+	function Window:SetTitle(Text)
+		self.TitleBar:SetTitle(Text)
+	end
+
+	function Window:SetSubtitle(Text)
+		self.TitleBar:SetSubtitle(Text)
+	end
+
 	local TabModule = require(Components.Tab):Init(Window)
 	function Window:AddTab(TabConfig)
 		return TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)

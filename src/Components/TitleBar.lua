@@ -28,6 +28,45 @@ return function(Config)
 	local SubTitleBelow = Config.SubTitlePosition == "Below"
 	local BarHeight = 42
 
+	TitleBar.TitleLabel = New("TextLabel", {
+		RichText = true,
+		Text = Config.Title,
+		FontFace = Font.new(
+			"rbxasset://fonts/families/GothamSSm.json",
+			Enum.FontWeight.Regular,
+			Enum.FontStyle.Normal
+		),
+		TextSize = Config.TitleSize or 13,
+		TextXAlignment = "Left",
+		TextYAlignment = "Center",
+		Size = SubTitleBelow and UDim2.new(0, 0, 0, 13) or UDim2.fromScale(0, 1),
+		AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
+		BackgroundTransparency = 1,
+		ThemeTag = {
+			TextColor3 = "Text",
+		},
+	})
+
+	TitleBar.SubTitleLabel = New("TextLabel", {
+		RichText = true,
+		Text = Config.SubTitle,
+		TextTransparency = 0.4,
+		FontFace = Font.new(
+			"rbxasset://fonts/families/GothamSSm.json",
+			Enum.FontWeight.Regular,
+			Enum.FontStyle.Normal
+		),
+		TextSize = SubTitleBelow and 11 or 13,
+		TextXAlignment = "Left",
+		TextYAlignment = "Center",
+		Size = SubTitleBelow and UDim2.new(0, 0, 0, 12) or UDim2.fromScale(0, 1),
+		AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
+		BackgroundTransparency = 1,
+		ThemeTag = {
+			TextColor3 = "Text",
+		},
+	})
+
 	local function BarButton(Icon, Pos, Parent, Callback)
 		local Button = {
 			Callback = Callback or function() end,
@@ -111,43 +150,9 @@ return function(Config)
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
 				}),
-				New("TextLabel", {
-					RichText = true,
-					Text = Config.Title,
-					FontFace = Font.new(
-						"rbxasset://fonts/families/GothamSSm.json",
-						Enum.FontWeight.Regular,
-						Enum.FontStyle.Normal
-					),
-					TextSize = Config.TitleSize or 13,
-					TextXAlignment = "Left",
-					TextYAlignment = "Center",
-					Size = SubTitleBelow and UDim2.new(0, 0, 0, 13) or UDim2.fromScale(0, 1),
-					AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
-					BackgroundTransparency = 1,
-					ThemeTag = {
-						TextColor3 = "Text",
-					},
-				}),
-				New("TextLabel", {
-					RichText = true,
-					Text = Config.SubTitle,
-					TextTransparency = 0.4,
-					FontFace = Font.new(
-						"rbxasset://fonts/families/GothamSSm.json",
-						Enum.FontWeight.Regular,
-						Enum.FontStyle.Normal
-					),
-					TextSize = SubTitleBelow and 11 or 13,
-					TextXAlignment = "Left",
-					TextYAlignment = "Center",
-					Size = SubTitleBelow and UDim2.new(0, 0, 0, 12) or UDim2.fromScale(0, 1),
-					AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
-					BackgroundTransparency = 1,
-					ThemeTag = {
-						TextColor3 = "Text",
-					},
-				}),
+				TitleBar.TitleLabel,
+				TitleBar.SubTitleLabel,
+
 			}),
 			TitleBar.TagsFrame,
 		}),
@@ -261,6 +266,18 @@ return function(Config)
 		end
 
 		return Tag
+	end
+
+	function TitleBar:SetTitle(Text)
+		if self.TitleLabel then
+			self.TitleLabel.Text = Text
+		end
+	end
+
+	function TitleBar:SetSubtitle(Text)
+		if self.SubTitleLabel then
+			self.SubTitleLabel.Text = Text
+		end
 	end
 
 	return TitleBar
