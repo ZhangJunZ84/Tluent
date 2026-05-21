@@ -118,6 +118,7 @@ function Library:CreateWindow(Config)
 	Library.UseAcrylic = Config.Acrylic or false
 	Library.Acrylic = Config.Acrylic or false
 	Library.Theme = Config.Theme or "Dark"
+	Library.Transparency = Config.Transparency == nil and true or Config.Transparency
 	if Config.Acrylic then
 		Acrylic.init()
 	end
@@ -134,6 +135,7 @@ function Library:CreateWindow(Config)
 
 	Library.Window = Window
 	Library:SetTheme(Config.Theme)
+	Library:ToggleTransparency(Library.Transparency)
 
 	return Window
 end

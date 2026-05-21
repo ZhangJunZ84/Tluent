@@ -9,7 +9,8 @@ local Window = Fluent:CreateWindow({
     TabStyle = "Tabs", -- "Tabs" or "Icons"
     TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
-    Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
+    Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
+    Transparency = false,
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
