@@ -12,11 +12,10 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Dropdown Search
 
 ### To-do
-- [ ] More Icons
-- [ ] More Themes
 - [ ] Auto Save Config
 - [ ] Style Overhaul
-
+- [ ] More Icons
+- [ ] More Themes
 
 ## How to run locally
 1 - Clone the repo
