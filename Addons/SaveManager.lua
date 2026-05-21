@@ -3,6 +3,12 @@ local httpService = game:GetService("HttpService")
 local SaveManager = {} do
 	SaveManager.Folder = "FluentSettings"
 	SaveManager.Ignore = {}
+	SaveManager.AutoSave = true
+	SaveManager.AutoSaveConfigName = "__autosave"
+	SaveManager._loading = false
+	SaveManager._initialized = false
+	SaveManager._hookedOptions = {}
+	SaveManager._autoSaveTimer = nil
 	SaveManager.Parser = {
 		Toggle = {
 			Save = function(idx, object) 
@@ -20,7 +26,7 @@ local SaveManager = {} do
 			end,
 			Load = function(idx, data)
 				if SaveManager.Options[idx] then 
-					SaveManager.Options[idx]:SetValue(data.value)
+					SaveManager.Options[idx]:SetValue(tonumber(data.value))
 				end
 			end,
 		},
@@ -113,15 +119,21 @@ local SaveManager = {} do
 		local file = self.Folder .. "/settings/" .. name .. ".json"
 		if not isfile(file) then return false, "invalid file" end
 
+		self._loading = true
+
 		local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
-		if not success then return false, "decode error" end
+		if not success then
+			self._loading = false
+			return false, "decode error"
+		end
 
 		for _, option in next, decoded.objects do
-			if self.Parser[option.type] then
-				task.spawn(function() self.Parser[option.type].Load(option.idx, option) end) -- task.spawn() so the config loading wont get stuck.
+			if self.Parser[option.type] and not self.Ignore[option.idx] then
+				pcall(self.Parser[option.type].Load, option.idx, option)
 			end
 		end
 
+		self._loading = false
 		return true
 	end
 
@@ -163,7 +175,7 @@ local SaveManager = {} do
 
 				if char == "/" or char == "\\" then
 					local name = file:sub(pos + 1, start - 1)
-					if name ~= "options" then
+					if name ~= "options" and name ~= SaveManager.AutoSaveConfigName then
 						table.insert(out, name)
 					end
 				end
@@ -179,25 +191,119 @@ local SaveManager = {} do
 	end
 
 	function SaveManager:LoadAutoloadConfig()
-		if isfile(self.Folder .. "/settings/autoload.txt") then
-			local name = readfile(self.Folder .. "/settings/autoload.txt")
+		-- Legacy method: delegates to AutoLoad() which handles
+		-- autoload-first then fallback-to-autosave flow.
+		self:AutoLoad()
+	end
 
-			local success, err = self:Load(name)
-			if not success then
-				return self.Library:Notify({
+	function SaveManager:AutoLoad()
+		if self._initialized then
+			return
+		end
+
+		-- Try autoload first
+		local autoloadFile = self.Folder .. "/settings/autoload.txt"
+		if isfile(autoloadFile) then
+			local name = readfile(autoloadFile)
+			local success = self:Load(name)
+			if success then
+				self._initialized = true
+				self.Library:Notify({
 					Title = "Interface",
 					Content = "Config loader",
-					SubContent = "Failed to load autoload config: " .. err,
+					SubContent = string.format("Auto loaded config %q", name),
+					Duration = 7
+				})
+				return
+			end
+		end
+
+		-- Fallback to autosave
+		local file = self.Folder .. "/settings/" .. self.AutoSaveConfigName .. ".json"
+		if isfile(file) then
+			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
+			if success and decoded.objects then
+				self._loading = true
+				local restored = 0
+				for _, option in next, decoded.objects do
+					if self.Parser[option.type] and not self.Ignore[option.idx] then
+						local ok = pcall(self.Parser[option.type].Load, option.idx, option)
+						if ok then
+							restored = restored + 1
+						end
+					end
+				end
+				self._loading = false
+
+				if restored > 0 and self.Library then
+					self.Library:Notify({
+						Title = "Interface",
+						Content = "Config loader",
+						SubContent = "Auto loaded last session",
+						Duration = 7
+					})
+				end
+			end
+		end
+
+		self._initialized = true
+	end
+
+	function SaveManager:DoAutoSave()
+		if not self._initialized or not self.AutoSave or self._loading then return end
+
+		if self._autoSaveTimer then
+			pcall(task.cancel, self._autoSaveTimer)
+		end
+
+		self._autoSaveTimer = task.delay(0.5, function()
+			self._autoSaveTimer = nil
+			self:SetupAutoSaveHooks() -- Hook any newly created options
+			local success, err = pcall(function()
+				self:Save(self.AutoSaveConfigName)
+			end)
+			if not success and self.Library then
+				self.Library:Notify({
+					Title = "Auto Save",
+					Content = "Failed to auto save",
+					SubContent = tostring(err),
 					Duration = 7
 				})
 			end
+		end)
+	end
 
-			self.Library:Notify({
-				Title = "Interface",
-				Content = "Config loader",
-				SubContent = string.format("Auto loaded config %q", name),
-				Duration = 7
-			})
+	function SaveManager:SetupAutoSaveHooks()
+		for idx, option in next, self.Options do
+			if self._hookedOptions[idx] then continue end
+			if not self.Parser[option.Type] then continue end
+			if self.Ignore[idx] then continue end
+
+			local originalSetValue = option.SetValue
+			if originalSetValue then
+				option.SetValue = function(self_opt, ...)
+					originalSetValue(self_opt, ...)
+					pcall(function() SaveManager:DoAutoSave() end)
+				end
+			end
+
+			local originalCallback = option.Callback
+			if originalCallback then
+				option.Callback = function(self_opt, ...)
+					originalCallback(self_opt, ...)
+					pcall(function() SaveManager:DoAutoSave() end)
+				end
+			end
+
+			local originalChanged = option.Changed
+			if originalChanged then
+				option.Changed = function(self_opt, ...)
+					originalChanged(self_opt, ...)
+					pcall(function() SaveManager:DoAutoSave() end)
+				end
+			end
+
+			self._hookedOptions[idx] = true
 		end
 	end
 
@@ -247,6 +353,14 @@ local SaveManager = {} do
 
         section:AddButton({Title = "Load config", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+			if not name or name:gsub(" ", "") == "" then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "No config selected to load",
+					Duration = 7
+				})
+			end
 
 			local success, err = self:Load(name)
 			if not success then
@@ -258,6 +372,8 @@ local SaveManager = {} do
 				})
 			end
 
+			self:DoAutoSave() -- Sync loaded state to autosave
+
 			self.Library:Notify({
 				Title = "Interface",
 				Content = "Config loader",
@@ -268,6 +384,14 @@ local SaveManager = {} do
 
 		section:AddButton({Title = "Overwrite config", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+			if not name or name:gsub(" ", "") == "" then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "No config selected to overwrite",
+					Duration = 7
+				})
+			end
 
 			local success, err = self:Save(name)
 			if not success then
@@ -292,9 +416,60 @@ local SaveManager = {} do
 			SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
 		end})
 
+		section:AddButton({Title = "Delete config", Callback = function()
+			local name = SaveManager.Options.SaveManager_ConfigList.Value
+			if not name or name:gsub(" ", "") == "" then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "No config selected to delete",
+					Duration = 7
+				})
+			end
+
+			local file = self.Folder .. "/settings/" .. name .. ".json"
+			if not isfile(file) then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "Config file not found",
+					Duration = 7
+				})
+			end
+
+			local success, err = pcall(delfile, file)
+			if not success then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "Failed to delete config: " .. tostring(err),
+					Duration = 7
+				})
+			end
+
+			SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+			SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
+
+			self.Library:Notify({
+				Title = "Interface",
+				Content = "Config loader",
+				SubContent = string.format("Deleted config %q", name),
+				Duration = 7
+			})
+		end})
+
 		local AutoloadButton
 		AutoloadButton = section:AddButton({Title = "Set as autoload", Description = "Current autoload config: none", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+			if not name or name:gsub(" ", "") == "" then
+				return self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "No config selected to autoload",
+					Duration = 7
+				})
+			end
+
 			writefile(self.Folder .. "/settings/autoload.txt", name)
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
 			self.Library:Notify({
@@ -310,7 +485,34 @@ local SaveManager = {} do
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
 		end
 
+		section:AddButton({Title = "Clear autoload", Callback = function()
+			local autoloadPath = self.Folder .. "/settings/autoload.txt"
+			if isfile(autoloadPath) then
+				delfile(autoloadPath)
+				AutoloadButton:SetDesc("Current autoload config: none")
+				self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "Cleared autoload config",
+					Duration = 7
+				})
+			end
+		end})
+
+		section:AddToggle("SaveManager_AutoSave", {
+			Title = "Auto Save",
+			Description = "Automatically saves config on every change",
+			Default = true,
+			Callback = function(Value)
+				SaveManager.AutoSave = Value
+				if Value and SaveManager._initialized then
+					SaveManager:DoAutoSave()
+				end
+			end
+		})
+
 		SaveManager:SetIgnoreIndexes({ "SaveManager_ConfigList", "SaveManager_ConfigName" })
+		SaveManager:SetupAutoSaveHooks()
 	end
 
 	SaveManager:BuildFolderTree()
