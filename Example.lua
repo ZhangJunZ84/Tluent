@@ -1,12 +1,13 @@
 local Fluent = loadstring(game:HttpGet("http://localhost:8642/dist/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("http://localhost:8642/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("http://localhost:8642/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Fluent " .. Fluent.Version,
-    SubTitle = "by dawid",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
+    Title = "Title " .. Fluent.Version,
+    SubTitle = "subtitle",
+    SubTitlePosition = "Side", -- "Below" or "Side" (default)
+    TabWidth = 100,
+    Size = UDim2.fromOffset(520, 400),
     Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
@@ -21,6 +22,19 @@ local Tabs = {
 local Options = Fluent.Options
 
 do
+    Window:Tag({
+        Title = "v0.1.0",
+        Icon = "check",
+        Color = Color3.fromHex("#21c93d"),
+        Radius = 6,
+    })
+    Window:Tag({
+        Title = "Discord",
+        Icon = "scan",
+        Color = Color3.fromHex("#214ec9"),
+        Radius = 6,
+    })
+
     Fluent:Notify({
         Title = "Notification",
         Content = "This is a notification",
@@ -28,14 +42,25 @@ do
         Duration = 5 -- Set to nil to make the notification not disappear
     })
 
-
-
+    Tabs.Main:AddSection({ Title = "Default Section" })
     Tabs.Main:AddParagraph({
         Title = "Paragraph",
-        Content = "This is a paragraph.\nSecond line!"
+        Content = "This is a default paragraph.\nSecond line!"
     })
 
+    Tabs.Main:AddSection({ Title = "Centered Section", Justify = "Center" })
+    Tabs.Main:AddParagraph({
+        Title = "Paragraph",
+        Content = "This is a centered paragraph.\nSecond line!",
+        Justify = "Center"
+    })
 
+    Tabs.Main:AddSection({ Title = "Rigt Section", Justify = "Right" })
+    Tabs.Main:AddParagraph({
+        Title = "Paragraph",
+        Content = "This is a right paragraph.\nSecond line!",
+        Justify = "Right"
+    })
 
     Tabs.Main:AddButton({
         Title = "Button",
@@ -249,12 +274,6 @@ SaveManager:BuildConfigSection(Tabs.Settings)
 
 Window:SelectTab(1)
 
-Fluent:Notify({
-    Title = "Fluent",
-    Content = "The script has been loaded.",
-    Duration = 8
-})
-
--- You can use the SaveManager:LoadAutoloadConfig() to load a config
--- which has been marked to be one that auto loads!
-SaveManager:LoadAutoloadConfig()
+-- AutoLoad() will first try to load the autoload config (if set),
+-- then fall back to restoring the last autosaved session.
+SaveManager:AutoLoad()
