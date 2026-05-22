@@ -2,6 +2,7 @@ local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local Acrylic = require(Root.Acrylic)
+local TweenService = game:GetService("TweenService")
 
 local Spring = Flipper.Spring.new
 local Instant = Flipper.Instant.new
@@ -150,6 +151,20 @@ function Notification:New(Config)
 		NewNotification.Root,
 	})
 
+	local ProgressBar = New("Frame", {
+		Size = UDim2.new(1, -28, 0, 3),
+		Position = UDim2.new(0, 14, 1, -8),
+		BorderSizePixel = 0,
+		Parent = NewNotification.Root,
+		ThemeTag = {
+			BackgroundColor3 = "Accent",
+		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(1, 0),
+		}),
+	})
+
 	local RootMotor = Flipper.GroupMotor.new({
 		Scale = 1,
 		Offset = 60,
@@ -192,9 +207,17 @@ function Notification:New(Config)
 
 	NewNotification:Open()
 	if Config.Duration then
+		ProgressBar.Size = UDim2.new(1, -28, 0, 3)
+		local Tween = TweenService:Create(ProgressBar, TweenInfo.new(Config.Duration, Enum.EasingStyle.Linear), {
+			Size = UDim2.new(0, 0, 0, 3),
+		})
+		Tween:Play()
+
 		task.delay(Config.Duration, function()
 			NewNotification:Close()
 		end)
+	else
+		ProgressBar.Visible = false
 	end
 	return NewNotification
 end
