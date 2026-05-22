@@ -1,6 +1,7 @@
 local Root = script.Parent.Parent
 local Assets = require(script.Parent.Assets)
 local Creator = require(Root.Creator)
+local Icons = require(Root.Icons)
 local Flipper = require(Root.Packages.Flipper)
 
 local New = Creator.New
@@ -219,11 +220,6 @@ return function(Config)
 	function TitleBar:AddTag(Config)
 		Config = Config or {}
 
-		local IconImage
-		if Config.Icon then
-			IconImage = Library:GetIcon(Config.Icon)
-		end
-
 		local BgColor = Config.Color
 		local TextColor = Config.TextColor
 		local UseTheme = (BgColor == nil)
@@ -312,14 +308,13 @@ return function(Config)
 			IconThemeTag = nil
 		end
 
-		if IconImage then
-			table.insert(Children, New("ImageLabel", {
+		if Config.Icon then
+			local IconObject = Icons.Image({
+				Icon = Config.Icon,
 				Size = UDim2.fromOffset(14, 14),
-				BackgroundTransparency = 1,
-				Image = IconImage,
-				ImageColor3 = IconColor,
-				ThemeTag = IconThemeTag,
-			}))
+				Colors = { TextColor or (UseTheme and "Accent") or Color3.fromRGB(255, 255, 255) }
+			})
+			table.insert(Children, IconObject.IconFrame)
 		end
 
 		local LabelColor, LabelThemeTag

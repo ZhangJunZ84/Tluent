@@ -14,10 +14,10 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] SetTitle and SetSubtitle
 - [x] Tab Style (Tabs/Icons)
 - [x] More Themes
+- [x] More Icons
 
 ### To-do
 - [ ] Style Overhaul
-- [ ] More Icons
 
 ## How to run locally
 1 - Clone the repo

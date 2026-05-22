@@ -1,6 +1,7 @@
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
+local Icons = require(Root.Icons)
 
 local New = Creator.New
 local Spring = Flipper.Spring.new
@@ -41,15 +42,16 @@ function TabModule:New(Title, Icon, Parent)
 		Type = "Tab",
 	}
 
-	if Library:GetIcon(Icon) then
-		Icon = Library:GetIcon(Icon)
-	end
-
-	if Icon == "" or nil then
-		Icon = nil
-	end
-
 	local IsIconMode = Window.TabStyle == "Icons"
+
+	local IconObject = Icons.Image({
+		Icon = Icon,
+		Size = UDim2.fromOffset(16, 16),
+		Colors = { "Text" }
+	})
+	local IconFrame = IconObject.IconFrame
+	IconFrame.AnchorPoint = IsIconMode and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
+	IconFrame.Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
 
 	Tab.Frame = New("TextButton", {
 		Size = UDim2.new(1, 0, 0, 34),
@@ -83,16 +85,7 @@ function TabModule:New(Title, Icon, Parent)
 				TextColor3 = "Text",
 			},
 		}) or nil,
-		New("ImageLabel", {
-			AnchorPoint = IsIconMode and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5),
-			Size = UDim2.fromOffset(16, 16),
-			Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0),
-			BackgroundTransparency = 1,
-			Image = Icon and Icon or nil,
-			ThemeTag = {
-				ImageColor3 = "Text",
-			},
-		}),
+		IconFrame,
 	})
 
 	local ContainerLayout = New("UIListLayout", {

@@ -3,8 +3,8 @@ local SaveManager = loadstring(game:HttpGet("http://localhost:8642/Addons/SaveMa
 local InterfaceManager = loadstring(game:HttpGet("http://localhost:8642/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Title " .. Fluent.Version,
-    SubTitle = "subtitle",
+    Title = "Tluent Library",
+    SubTitle = "",
     SubTitlePosition = "Side", -- "Below" or "Side" (default)
     TabStyle = "Tabs", -- "Tabs" or "Icons"
     TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
@@ -15,17 +15,23 @@ local Window = Fluent:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 
---Fluent provides Lucide Icons https://lucide.dev/icons/ for the tabs, icons are optional
+-- Tluent provides multi-pack icon support! You can use Lucide, Solar, Craft, Geist, SF Symbols, Gravity, or raw Roblox assets.
+-- 1. Standard Namespaced Prefix: Use "pack:icon_name" (e.g., "solar:home-angle-bold", "geist:settings", "gravity:home").
+-- 2. Default Pack: If no prefix is specified, it defaults to Lucide (e.g., "box" maps to "lucide:box").
+-- 3. Raw Roblox Assets: Use raw paths directly (e.g., "rbxassetid://92867583610071", "rbxasset://textures/...").
+-- 4. Dynamic Custom Icons: Register your own custom packs dynamically using Fluent.Icons.AddIcons.
+
 local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "box" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+    Main = Window:AddTab({ Title = "Main", Icon = "globe" }),
+    IconTest = Window:AddTab({ Title = "Icon Test", Icon = "gravity:star-fill" }),
+    Settings = Window:AddTab({ Title= "Settings", Icon = "gravity:gear" })
 }
 
 local Options = Fluent.Options
 
 do
     local VersionTag = Window:Tag({
-        Title = "v0.1.5",
+        Title = Fluent.Version,
         Icon = "info", -- Optional
         Color = Color3.fromHex("#a1ff9e"), -- Optional, if not set, the color will be the same as the theme
         Radius = 6, -- Optional, Default: 6
@@ -70,7 +76,7 @@ do
         Justify = "Center"
     })
 
-    Tabs.Main:AddSection({ Title = "Rigt Section", Justify = "Right" })
+    Tabs.Main:AddSection({ Title = "Right Section", Justify = "Right" })
     Tabs.Main:AddParagraph({
         Title = "Paragraph",
         Content = "This is a right paragraph.\nSecond line!",

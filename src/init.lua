@@ -23,7 +23,7 @@ ProtectGui(GUI)
 NotificationModule:Init(GUI)
 
 local Library = {
-	Version = "0.0.1",
+	Version = "0.0.2",
 
 	OpenFrames = {},
 	Options = {},
@@ -79,12 +79,11 @@ function Library:Round(Number, Factor)
 	return Number:find("%.") and tonumber(Number:sub(1, Number:find("%.") + Factor)) or Number
 end
 
-local Icons = require(Root.Icons).assets
+local Icons = require(Root.Icons).Init(Creator.New, "Text")
+Library.Icons = Icons
+
 function Library:GetIcon(Name)
-	if Name ~= nil and Icons["lucide-" .. Name] then
-		return Icons["lucide-" .. Name]
-	end
-	return nil
+	return Icons.GetIcon(Name)
 end
 
 local Elements = {}
