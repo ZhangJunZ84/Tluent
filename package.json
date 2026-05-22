@@ -5,8 +5,8 @@
   "main": "init.lua",
   "scripts": {
     "rojo": "mkdirp dist && rojo build -o dist/main.rbxm",
-    "bundle": "pnpm run rojo && lune build",
-    "build": "powershell -ExecutionPolicy Bypass -File build.ps1",
+    "bundle": "npm run rojo && lune build",
+    "build": "mkdirp dist && rojo build -o dist/main.rbxm && lune build",
     "live": "mkdirp dist && python -m http.server 8642",
     "watch": "chokidar \"src\" -c \"npm run build\"",
     "live-build": "npm run build && concurrently \"npm run live\" \"npm run watch\""
