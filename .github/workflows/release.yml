@@ -2,6 +2,11 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name (e.g. v0.0.2). If omitted, falls back to github.ref_name'
+        required: false
+        type: string
   release:
     types: [ published, prereleased ]
     
@@ -37,9 +42,9 @@ jobs:
       run: pnpm run bundle
       
     - name: Upload Release Assets
-      uses: alexellis/upload-assets@0.4.0
-      env:
-        ACTIONS_STEP_DEBUG: true
-        GITHUB_TOKEN: ${{ github.token }}
+      uses: softprops/action-gh-release@v2
       with:
-        asset_paths: '["dist/main.rbxm", "dist/main.lua"]'
+        tag_name: ${{ github.event.release.tag_name || github.event.inputs.tag_name || github.ref_name }}
+        files: |
+          dist/main.rbxm
+          dist/main.lua
