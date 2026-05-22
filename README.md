@@ -13,11 +13,11 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Auto Save Config
 - [x] SetTitle and SetSubtitle
 - [x] Tab Style (Tabs/Icons)
+- [x] More Themes
 
 ### To-do
 - [ ] Style Overhaul
 - [ ] More Icons
-- [ ] More Themes
 
 ## How to run locally
 1 - Clone the repo
