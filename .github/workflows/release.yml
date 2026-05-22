@@ -15,12 +15,12 @@ jobs:
 
     steps:
     - name: GitHub Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup PNPM
-      uses: pnpm/action-setup@v2.2.4
+      uses: pnpm/action-setup@v4
       with:
-        version: 7.25.1
+        version: 9
         run_install: true
     
     - name: Setup Aftman
