@@ -224,9 +224,49 @@ return function(Config)
 			IconImage = Library:GetIcon(Config.Icon)
 		end
 
-		local TextColor = Config.TextColor or Color3.fromRGB(255, 255, 255)
-		local BgColor = Config.Color or Color3.fromRGB(0, 170, 255)
+		local BgColor = Config.Color
+		local TextColor = Config.TextColor
+		local UseTheme = (BgColor == nil)
+		local IsGradient = typeof(BgColor) == "ColorSequence"
+
+		-- Automatically compute text contrast color for custom backgrounds
+		if not UseTheme and not TextColor then
+			if IsGradient then
+				local Total = 0
+				local Keypoints = BgColor.Keypoints
+				for _, Keypoint in ipairs(Keypoints) do
+					local C = Keypoint.Value
+					Total = Total + (0.299 * C.R + 0.587 * C.G + 0.114 * C.B)
+				end
+				local AvgLuminance = Total / #Keypoints
+				if AvgLuminance > 0.55 then
+					TextColor = Color3.fromRGB(30, 30, 30)
+				else
+					TextColor = Color3.fromRGB(255, 255, 255)
+				end
+			else
+				local r, g, b = BgColor.R, BgColor.G, BgColor.B
+				local luminance = 0.299 * r + 0.587 * g + 0.114 * b
+				if luminance > 0.55 then
+					TextColor = Color3.fromRGB(30, 30, 30)
+				else
+					TextColor = Color3.fromRGB(255, 255, 255)
+				end
+			end
+		end
+
 		local Radius = math.clamp(Config.Radius or 4, 0, 13)
+
+		local StrokeColor, StrokeThemeTag
+		if UseTheme then
+			StrokeColor = Creator.GetThemeProperty("Accent")
+			StrokeThemeTag = { Color = "Accent" }
+		else
+			-- If a custom background is used, outline with the text color (with opacity)
+			-- to guarantee perfect contrast and definition.
+			StrokeColor = TextColor or (not IsGradient and BgColor) or Color3.fromRGB(255, 255, 255)
+			StrokeThemeTag = nil
+		end
 
 		local Children = {
 			New("UICorner", {
@@ -238,6 +278,13 @@ return function(Config)
 				PaddingTop = UDim.new(0, 3),
 				PaddingBottom = UDim.new(0, 3),
 			}),
+			New("UIStroke", {
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				Thickness = 1,
+				Transparency = UseTheme and 0.6 or 0.7,
+				Color = StrokeColor,
+				ThemeTag = StrokeThemeTag,
+			}),
 			New("UIListLayout", {
 				Padding = UDim.new(0, 4),
 				FillDirection = Enum.FillDirection.Horizontal,
@@ -246,13 +293,45 @@ return function(Config)
 			}),
 		}
 
+		if IsGradient then
+			table.insert(Children, New("UIGradient", {
+				Color = BgColor,
+				Rotation = Config.Rotation or 0,
+			}))
+		end
+
+		local IconColor, IconThemeTag
+		if TextColor then
+			IconColor = TextColor
+			IconThemeTag = nil
+		elseif UseTheme then
+			IconColor = Creator.GetThemeProperty("Accent")
+			IconThemeTag = { ImageColor3 = "Accent" }
+		else
+			IconColor = Color3.fromRGB(255, 255, 255)
+			IconThemeTag = nil
+		end
+
 		if IconImage then
 			table.insert(Children, New("ImageLabel", {
 				Size = UDim2.fromOffset(14, 14),
 				BackgroundTransparency = 1,
 				Image = IconImage,
-				ImageColor3 = TextColor,
+				ImageColor3 = IconColor,
+				ThemeTag = IconThemeTag,
 			}))
+		end
+
+		local LabelColor, LabelThemeTag
+		if TextColor then
+			LabelColor = TextColor
+			LabelThemeTag = nil
+		elseif UseTheme then
+			LabelColor = Creator.GetThemeProperty("Accent")
+			LabelThemeTag = { TextColor3 = "Accent" }
+		else
+			LabelColor = Color3.fromRGB(255, 255, 255)
+			LabelThemeTag = nil
 		end
 
 		table.insert(Children, New("TextLabel", {
@@ -263,18 +342,34 @@ return function(Config)
 				Enum.FontStyle.Normal
 			),
 			TextSize = 12,
-			TextColor3 = TextColor,
+			TextColor3 = LabelColor,
+			ThemeTag = LabelThemeTag,
 			BackgroundTransparency = 1,
 			Size = UDim2.fromScale(0, 0),
 			AutomaticSize = Enum.AutomaticSize.XY,
 		}))
 
-		local TagFrame = New("Frame", {
-			Size = UDim2.fromScale(0, 0),
-			AutomaticSize = Enum.AutomaticSize.XY,
-			BackgroundColor3 = BgColor,
-			Parent = self.TagsFrame,
-		}, Children)
+		local TagFrame
+		if UseTheme then
+			TagFrame = New("Frame", {
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundColor3 = Creator.GetThemeProperty("Accent"),
+				BackgroundTransparency = 0.89,
+				ThemeTag = {
+					BackgroundColor3 = "Accent",
+				},
+				Parent = self.TagsFrame,
+			}, Children)
+		else
+			TagFrame = New("Frame", {
+				Size = UDim2.fromScale(0, 0),
+				AutomaticSize = Enum.AutomaticSize.XY,
+				BackgroundColor3 = IsGradient and Color3.fromRGB(255, 255, 255) or BgColor,
+				BackgroundTransparency = Config.BackgroundTransparency or 0,
+				Parent = self.TagsFrame,
+			}, Children)
+		end
 
 		local Tag = {
 			Frame = TagFrame,
@@ -288,6 +383,103 @@ return function(Config)
 			local TextLabel = TagFrame:FindFirstChildOfClass("TextLabel")
 			if TextLabel then
 				TextLabel.Text = Text
+			end
+		end
+
+		function Tag:SetColor(ColorData)
+			local TargetColor
+			local Rotation = 0
+			local IsColorSequence = false
+
+			if typeof(ColorData) == "Color3" then
+				TargetColor = ColorData
+			elseif typeof(ColorData) == "ColorSequence" then
+				TargetColor = ColorData
+				IsColorSequence = true
+			elseif typeof(ColorData) == "table" then
+				TargetColor = ColorData.Color
+				Rotation = ColorData.Rotation or 0
+				IsColorSequence = typeof(TargetColor) == "ColorSequence"
+			end
+
+			if not TargetColor then return end
+
+			local Gradient = TagFrame:FindFirstChildOfClass("UIGradient")
+			local TextColor
+			local StrokeColor
+
+			if IsColorSequence then
+				-- Calculate average luminance of keypoints
+				local Total = 0
+				local Keypoints = TargetColor.Keypoints
+				for _, Keypoint in ipairs(Keypoints) do
+					local C = Keypoint.Value
+					Total = Total + (0.299 * C.R + 0.587 * C.G + 0.114 * C.B)
+				end
+				local AvgLuminance = Total / #Keypoints
+
+				if AvgLuminance > 0.55 then
+					TextColor = Color3.fromRGB(30, 30, 30)
+				else
+					TextColor = Color3.fromRGB(255, 255, 255)
+				end
+				StrokeColor = TextColor
+
+				if not Gradient then
+					Gradient = New("UIGradient", {
+						Parent = TagFrame,
+					})
+				end
+				Gradient.Enabled = true
+				Gradient.Color = TargetColor
+				Gradient.Rotation = Rotation
+				TagFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				TagFrame.BackgroundTransparency = (typeof(ColorData) == "table" and ColorData.BackgroundTransparency) or 0
+			else
+				if Gradient then
+					Gradient.Enabled = false
+				end
+
+				local r, g, b = TargetColor.R, TargetColor.G, TargetColor.B
+				local luminance = 0.299 * r + 0.587 * g + 0.114 * b
+				if luminance > 0.55 then
+					TextColor = Color3.fromRGB(30, 30, 30)
+				else
+					TextColor = Color3.fromRGB(255, 255, 255)
+				end
+				StrokeColor = TextColor
+
+				TagFrame.BackgroundColor3 = TargetColor
+				TagFrame.BackgroundTransparency = (typeof(ColorData) == "table" and ColorData.BackgroundTransparency) or 0
+			end
+
+			-- Update elements and detach ThemeTag updates to prevent overrides
+			local TextLabel = TagFrame:FindFirstChildOfClass("TextLabel")
+			if TextLabel then
+				TextLabel.TextColor3 = TextColor
+				if Creator.Registry[TextLabel] then
+					Creator.Registry[TextLabel].Properties.TextColor3 = nil
+				end
+			end
+
+			local ImageLabel = TagFrame:FindFirstChildOfClass("ImageLabel")
+			if ImageLabel then
+				ImageLabel.ImageColor3 = TextColor
+				if Creator.Registry[ImageLabel] then
+					Creator.Registry[ImageLabel].Properties.ImageColor3 = nil
+				end
+			end
+
+			local UIStroke = TagFrame:FindFirstChildOfClass("UIStroke")
+			if UIStroke then
+				UIStroke.Color = StrokeColor
+				if Creator.Registry[UIStroke] then
+					Creator.Registry[UIStroke].Properties.Color = nil
+				end
+			end
+
+			if Creator.Registry[TagFrame] then
+				Creator.Registry[TagFrame].Properties.BackgroundColor3 = nil
 			end
 		end
 

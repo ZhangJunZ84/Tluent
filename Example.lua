@@ -24,11 +24,37 @@ local Tabs = {
 local Options = Fluent.Options
 
 do
+    local VersionTag = Window:Tag({
+        Title = "v0.1.5",
+        Icon = "info", -- Optional
+        Color = Color3.fromHex("#a1ff9e"), -- Optional, if not set, the color will be the same as the theme
+        Radius = 6, -- Optional, Default: 6
+    })
+
+    -- You can change the color of the tag with the `SetColor` method
+    -- And you can pass a ColorSequence too!
+    task.spawn(function()
+        while task.wait() do
+            if Fluent.Unloaded then break end
+            local Shift = os.clock() % 8 / 8
+            local Keypoints = {}
+            
+            for i = 0, 3 do
+                local RelativePos = i / 3
+                local Hue = (RelativePos - Shift) % 1
+                table.insert(Keypoints, ColorSequenceKeypoint.new(RelativePos, Color3.fromHSV(Hue, 0.6, 1)))
+            end
+            
+            VersionTag:SetColor({
+                Color = ColorSequence.new(Keypoints),
+                Rotation = 0
+            })
+        end
+    end)
+
     Window:Tag({
-        Title = "v0.1.0",
-        Icon = "check",
-        Color = Color3.fromHex("#21c93d"),
-        Radius = 6,
+        Title = "Created by TWVZ",
+        Icon = "flag",
     })
 
     Tabs.Main:AddSection({ Title = "Default Section" })
