@@ -6,6 +6,15 @@ local Themes = {
 		"Aqua",
 		"Amethyst",
 		"Rose",
+		"Synthwave",
+		"Sakura",
+		"MidnightGold",
+		"Emerald",
+		"Aero",
+		"Cosmic",
+		"Nord",
+		"Dracula",
+		"Brasil",
 	},
 }
 

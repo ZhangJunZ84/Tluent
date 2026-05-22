@@ -1,47 +1,47 @@
 return {
 	Name = "Amethyst",
-	Accent = Color3.fromRGB(97, 62, 167),
+	Accent = Color3.fromRGB(180, 110, 255), -- Glowing neon royal violet
 
-	AcrylicMain = Color3.fromRGB(20, 20, 20),
-	AcrylicBorder = Color3.fromRGB(110, 90, 130),
-	AcrylicGradient = ColorSequence.new(Color3.fromRGB(85, 57, 139), Color3.fromRGB(40, 25, 65)),
-	AcrylicNoise = 0.92,
+	AcrylicMain = Color3.fromRGB(18, 12, 28), -- Velvet space purple base
+	AcrylicBorder = Color3.fromRGB(56, 36, 85), -- Elegant dark amethyst steel border
+	AcrylicGradient = ColorSequence.new(Color3.fromRGB(32, 20, 50), Color3.fromRGB(14, 8, 22)), -- Smooth majestic purple gradient
+	AcrylicNoise = 0.96, -- Less visible grain for cleaner frosted glass
 
-	TitleBarLine = Color3.fromRGB(95, 75, 110),
-	Tab = Color3.fromRGB(160, 140, 180),
+	TitleBarLine = Color3.fromRGB(45, 30, 70),
+	Tab = Color3.fromRGB(255, 255, 255),
 
-	Element = Color3.fromRGB(140, 120, 160),
-	ElementBorder = Color3.fromRGB(60, 50, 70),
-	InElementBorder = Color3.fromRGB(100, 90, 110),
-	ElementTransparency = 0.87,
+	Element = Color3.fromRGB(255, 255, 255), -- Clean translucent highlighted cards
+	ElementBorder = Color3.fromRGB(30, 20, 45),
+	InElementBorder = Color3.fromRGB(75, 50, 110),
+	ElementTransparency = 0.95, -- Frosted high-transparency overlay
 
-	ToggleSlider = Color3.fromRGB(140, 120, 160),
-	ToggleToggled = Color3.fromRGB(0, 0, 0),
+	ToggleSlider = Color3.fromRGB(165, 150, 180),
+	ToggleToggled = Color3.fromRGB(255, 255, 255),
 
-	SliderRail = Color3.fromRGB(140, 120, 160),
+	SliderRail = Color3.fromRGB(48, 32, 72),
 
-	DropdownFrame = Color3.fromRGB(170, 160, 200),
-	DropdownHolder = Color3.fromRGB(60, 45, 80),
-	DropdownBorder = Color3.fromRGB(50, 40, 65),
-	DropdownOption = Color3.fromRGB(140, 120, 160),
+	DropdownFrame = Color3.fromRGB(255, 255, 255),
+	DropdownHolder = Color3.fromRGB(22, 14, 34),
+	DropdownBorder = Color3.fromRGB(36, 24, 56),
+	DropdownOption = Color3.fromRGB(255, 255, 255),
 
-	Keybind = Color3.fromRGB(140, 120, 160),
+	Keybind = Color3.fromRGB(255, 255, 255),
 
-	Input = Color3.fromRGB(140, 120, 160),
-	InputFocused = Color3.fromRGB(20, 10, 30),
-	InputIndicator = Color3.fromRGB(170, 150, 190),
+	Input = Color3.fromRGB(255, 255, 255),
+	InputFocused = Color3.fromRGB(14, 8, 22),
+	InputIndicator = Color3.fromRGB(165, 150, 180),
 
-	Dialog = Color3.fromRGB(60, 45, 80),
-	DialogHolder = Color3.fromRGB(45, 30, 65),
-	DialogHolderLine = Color3.fromRGB(40, 25, 60),
-	DialogButton = Color3.fromRGB(60, 45, 80),
-	DialogButtonBorder = Color3.fromRGB(95, 80, 110),
-	DialogBorder = Color3.fromRGB(85, 70, 100),
-	DialogInput = Color3.fromRGB(70, 55, 85),
-	DialogInputLine = Color3.fromRGB(175, 160, 190),
+	Dialog = Color3.fromRGB(26, 18, 40),
+	DialogHolder = Color3.fromRGB(18, 12, 28),
+	DialogHolderLine = Color3.fromRGB(34, 22, 52),
+	DialogButton = Color3.fromRGB(34, 22, 52),
+	DialogButtonBorder = Color3.fromRGB(60, 40, 92),
+	DialogBorder = Color3.fromRGB(50, 32, 76),
+	DialogInput = Color3.fromRGB(22, 14, 34),
+	DialogInputLine = Color3.fromRGB(165, 150, 180),
 
-	Text = Color3.fromRGB(240, 240, 240),
-	SubText = Color3.fromRGB(170, 170, 170),
-	Hover = Color3.fromRGB(140, 120, 160),
-	HoverChange = 0.04,
+	Text = Color3.fromRGB(255, 255, 255), -- Crisp high-visibility white
+	SubText = Color3.fromRGB(165, 150, 180), -- Soft lavender-silver subtext
+	Hover = Color3.fromRGB(255, 255, 255),
+	HoverChange = 0.03,
 }

@@ -30,19 +30,6 @@ do
         Color = Color3.fromHex("#21c93d"),
         Radius = 6,
     })
-    Window:Tag({
-        Title = "Discord",
-        Icon = "scan",
-        Color = Color3.fromHex("#214ec9"),
-        Radius = 6,
-    })
-
-    Fluent:Notify({
-        Title = "Notification",
-        Content = "This is a notification",
-        SubContent = "SubContent", -- Optional
-        Duration = 5 -- Set to nil to make the notification not disappear
-    })
 
     Tabs.Main:AddSection({ Title = "Default Section" })
     Tabs.Main:AddParagraph({
@@ -62,6 +49,18 @@ do
         Title = "Paragraph",
         Content = "This is a right paragraph.\nSecond line!",
         Justify = "Right"
+    })
+
+    Tabs.Main:AddButton({
+        Title = "Notify",
+        Callback = function()
+            Fluent:Notify({
+                Title = "Notification",
+                Content = "This is a notification",
+                SubContent = "SubContent", -- Optional
+                Duration = 3 -- Set to nil to make the notification not disappear
+            })
+        end
     })
 
     Tabs.Main:AddButton({

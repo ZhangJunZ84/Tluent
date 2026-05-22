@@ -67,7 +67,7 @@ return function(Config)
 		},
 	})
 
-	local function BarButton(Icon, Pos, Parent, Callback)
+	local function BarButton(Icon, Pos, Parent, Callback, IsClose)
 		local Button = {
 			Callback = Callback or function() end,
 		}
@@ -101,18 +101,44 @@ return function(Config)
 
 		local Motor, SetTransparency = Creator.SpringMotor(1, Button.Frame, "BackgroundTransparency")
 
-		AddSignal(Button.Frame.MouseEnter, function()
-			SetTransparency(0.94)
-		end)
-		AddSignal(Button.Frame.MouseLeave, function()
-			SetTransparency(1, true)
-		end)
-		AddSignal(Button.Frame.MouseButton1Down, function()
-			SetTransparency(0.96)
-		end)
-		AddSignal(Button.Frame.MouseButton1Up, function()
-			SetTransparency(0.94)
-		end)
+		if IsClose then
+			AddSignal(Button.Frame.MouseEnter, function()
+				Button.Frame.BackgroundColor3 = Color3.fromRGB(232, 17, 35)
+				Button.Frame.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+				SetTransparency(0)
+			end)
+			AddSignal(Button.Frame.MouseLeave, function()
+				SetTransparency(1, true)
+				task.delay(0.15, function()
+					if Button.Frame.BackgroundTransparency >= 0.99 then
+						Button.Frame.BackgroundColor3 = Creator.GetThemeProperty("Text")
+						Button.Frame.Icon.ImageColor3 = Creator.GetThemeProperty("Text")
+					end
+				end)
+			end)
+			AddSignal(Button.Frame.MouseButton1Down, function()
+				Button.Frame.BackgroundColor3 = Color3.fromRGB(175, 10, 25)
+				SetTransparency(0)
+			end)
+			AddSignal(Button.Frame.MouseButton1Up, function()
+				Button.Frame.BackgroundColor3 = Color3.fromRGB(232, 17, 35)
+				SetTransparency(0)
+			end)
+		else
+			AddSignal(Button.Frame.MouseEnter, function()
+				SetTransparency(0.94)
+			end)
+			AddSignal(Button.Frame.MouseLeave, function()
+				SetTransparency(1, true)
+			end)
+			AddSignal(Button.Frame.MouseButton1Down, function()
+				SetTransparency(0.96)
+			end)
+			AddSignal(Button.Frame.MouseButton1Up, function()
+				SetTransparency(0.94)
+			end)
+		end
+
 		AddSignal(Button.Frame.MouseButton1Click, Button.Callback)
 
 		Button.SetCallback = function(Func)
@@ -182,7 +208,7 @@ return function(Config)
 				},
 			},
 		})
-	end)
+	end, true)
 	TitleBar.MaxButton = BarButton(Assets.Max, UDim2.new(1, -40, 0, 4), TitleBar.Frame, function()
 		Config.Window.Maximize(not Config.Window.Maximized)
 	end)
