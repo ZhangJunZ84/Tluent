@@ -28,7 +28,7 @@ function Element:New(Idx, Config)
 		Callback = Config.Callback or function() end,
 	}
 
-	local SearchEnabled = Config.Search ~= false
+	local SearchEnabled = Config.Search == true
 
 	local DropdownFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, false)
 	DropdownFrame.DescLabel.Size = UDim2.new(1, -170, 0, 14)
@@ -234,6 +234,10 @@ function Element:New(Idx, Config)
 	RecalculateListSize()
 
 	Creator.AddSignal(DropdownInner:GetPropertyChangedSignal("AbsolutePosition"), RecalculateListPosition)
+	Creator.AddSignal(DropdownListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+		RecalculateCanvasSize()
+		RecalculateListSize()
+	end)
 
 	Creator.AddSignal(DropdownInner.MouseButton1Click, function()
 		Dropdown:Open()
@@ -259,7 +263,7 @@ function Element:New(Idx, Config)
 	if SearchEnabled then
 		Creator.AddSignal(SearchBox:GetPropertyChangedSignal("Text"), function()
 			Dropdown.SearchFilter = SearchBox.Text
-			Dropdown:BuildDropdownList()
+			Dropdown:ApplySearch()
 		end)
 	end
 
@@ -320,8 +324,12 @@ function Element:New(Idx, Config)
 	end
 
 	function Dropdown:BuildDropdownList()
-		local Values = Dropdown.Values
-		local Buttons = {}
+		Dropdown.Buttons = {}
+
+		if Dropdown.NoResultsLabel then
+			Dropdown.NoResultsLabel:Destroy()
+			Dropdown.NoResultsLabel = nil
+		end
 
 		for _, Element in next, DropdownScrollFrame:GetChildren() do
 			if not Element:IsA("UIListLayout") then
@@ -330,16 +338,11 @@ function Element:New(Idx, Config)
 		end
 
 		local Count = 0
-		local filterText = SearchEnabled and Dropdown.SearchFilter ~= "" and string.lower(Dropdown.SearchFilter) or nil
 
-		for Idx, Value in next, Values do
-			if filterText then
-				if not string.find(string.lower(tostring(Value)), filterText, 1, true) then
-					continue
-				end
-			end
-
-			local Table = {}
+		for Idx, Value in next, Dropdown.Values do
+			local Table = {
+				Value = Value
+			}
 
 			Count = Count + 1
 
@@ -451,7 +454,7 @@ function Element:New(Idx, Config)
 							Selected = Try
 							Dropdown.Value = Selected and Value or nil
 
-							for _, OtherButton in next, Buttons do
+							for _, OtherButton in next, Dropdown.Buttons do
 								OtherButton:UpdateButton()
 							end
 						end
@@ -468,29 +471,14 @@ function Element:New(Idx, Config)
 			Table:UpdateButton()
 			Dropdown:Display()
 
-			Buttons[Button] = Table
+			Dropdown.Buttons[Button] = Table
 		end
 
 		VisibleCount = Count
 
-		if Count == 0 and SearchEnabled and Dropdown.SearchFilter ~= "" then
-			local NoResultsLabel = New("TextLabel", {
-				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
-				Text = "No results found",
-				TextColor3 = Color3.fromRGB(200, 200, 200),
-				TextSize = 13,
-				BackgroundTransparency = 1,
-				Size = UDim2.new(1, -5, 0, 32),
-				ThemeTag = {
-					TextColor3 = "SubText",
-				},
-			})
-			NoResultsLabel.Parent = DropdownScrollFrame
-		end
-
 		if Count > 0 then
 			ListSizeX = 0
-			for Button, Table in next, Buttons do
+			for Button, Table in next, Dropdown.Buttons do
 				if Button.ButtonLabel then
 					if Button.ButtonLabel.TextBounds.X > ListSizeX then
 						ListSizeX = Button.ButtonLabel.TextBounds.X
@@ -498,6 +486,53 @@ function Element:New(Idx, Config)
 				end
 			end
 			ListSizeX = ListSizeX + 30
+		end
+
+		RecalculateCanvasSize()
+		RecalculateListSize()
+	end
+
+	function Dropdown:ApplySearch()
+		local filterText = SearchEnabled and Dropdown.SearchFilter ~= "" and string.lower(Dropdown.SearchFilter) or nil
+		local Count = 0
+
+		for Button, Table in next, Dropdown.Buttons do
+			local Value = Table.Value
+			local matches = true
+			if filterText then
+				if not string.find(string.lower(tostring(Value)), filterText, 1, true) then
+					matches = false
+				end
+			end
+
+			Button.Visible = matches
+			if matches then
+				Count = Count + 1
+			end
+		end
+
+		VisibleCount = Count
+
+		if Count == 0 and SearchEnabled and Dropdown.SearchFilter ~= "" then
+			if not Dropdown.NoResultsLabel then
+				Dropdown.NoResultsLabel = New("TextLabel", {
+					FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+					Text = "No results found",
+					TextColor3 = Color3.fromRGB(200, 200, 200),
+					TextSize = 13,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -5, 0, 32),
+					ThemeTag = {
+						TextColor3 = "SubText",
+					},
+				})
+			end
+			Dropdown.NoResultsLabel.Parent = DropdownScrollFrame
+			Dropdown.NoResultsLabel.Visible = true
+		else
+			if Dropdown.NoResultsLabel then
+				Dropdown.NoResultsLabel.Visible = false
+			end
 		end
 
 		RecalculateCanvasSize()
@@ -536,7 +571,10 @@ function Element:New(Idx, Config)
 			end
 		end
 
-		Dropdown:BuildDropdownList()
+		for _, ButtonTable in next, Dropdown.Buttons do
+			ButtonTable:UpdateButton()
+		end
+		Dropdown:Display()
 
 		Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
 		Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
@@ -582,7 +620,9 @@ function Element:New(Idx, Config)
 			end
 		end
 
-		Dropdown:BuildDropdownList()
+		for _, ButtonTable in next, Dropdown.Buttons do
+			ButtonTable:UpdateButton()
+		end
 		Dropdown:Display()
 	end
 
