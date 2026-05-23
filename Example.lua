@@ -23,7 +23,12 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "globe" }),
-    IconTest = Window:AddTab({ Title = "Icon Test", Icon = "gravity:star-fill" }),
+    -- You can add badges to tabs, and they can be updated using SetTitle and SetColor methods. Badges also support ColorSequences!
+    IconTest = Window:AddTab({ 
+        Title = "Icon Test", 
+        Icon = "gravity:star-fill",
+        Badge = { Title = "NEW", Color = Color3.fromHex("#ffe59e") }
+    }),
     Settings = Window:AddTab({ Title= "Settings", Icon = "gravity:gear" })
 }
 
@@ -82,6 +87,10 @@ do
         Content = "This is a right paragraph.\nSecond line!",
         Justify = "Right"
     })
+    
+    -- Dividers are a way to separate sections, you can set the width to make it shorter than the window
+    -- In pixels Width = 100, as a scale Width = 0.5 or as a UDim2.new(0.5, 20)
+    Tabs.Main:AddDivider({ Width = 10000 }) 
 
     Tabs.Main:AddButton({
         Title = "Notify",
