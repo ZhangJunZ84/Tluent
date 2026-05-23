@@ -15,10 +15,10 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Tab Style (Tabs/Icons)
 - [x] More Themes
 - [x] More Icons
+- [x] Divider Element
 
 ### To-do
 - [ ] Loading Screen
-- [ ] Divider Element
 - [ ] Tab Badges
 - [ ] Slider Input
 - [ ] Theme Creator

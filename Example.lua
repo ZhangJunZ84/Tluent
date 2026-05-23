@@ -82,6 +82,10 @@ do
         Content = "This is a right paragraph.\nSecond line!",
         Justify = "Right"
     })
+    
+    -- Dividers are a way to separate sections, you can set the width to make it shorter than the window
+    -- In pixels Width = 100, as a scale Width = 0.5 or as a UDim2.new(0.5, 20)
+    Tabs.Main:AddDivider({ Width = 10000 }) 
 
     Tabs.Main:AddButton({
         Title = "Notify",
