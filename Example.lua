@@ -23,7 +23,12 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "globe" }),
-    IconTest = Window:AddTab({ Title = "Icon Test", Icon = "gravity:star-fill" }),
+    -- You can add badges to tabs, and they can be updated using SetTitle and SetColor methods. Badges also support ColorSequences!
+    IconTest = Window:AddTab({ 
+        Title = "Icon Test", 
+        Icon = "gravity:star-fill",
+        Badge = { Title = "NEW", Color = Color3.fromHex("#ffe59e") }
+    }),
     Settings = Window:AddTab({ Title= "Settings", Icon = "gravity:gear" })
 }
 

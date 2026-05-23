@@ -396,7 +396,11 @@ return function(Config)
 
 	local TabModule = require(Components.Tab):Init(Window)
 	function Window:AddTab(TabConfig)
-		return TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)
+		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)
+		if TabConfig.Badge then
+			Tab:AddBadge(TabConfig.Badge)
+		end
+		return Tab
 	end
 
 	function Window:SelectTab(Tab)
