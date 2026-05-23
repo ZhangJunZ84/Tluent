@@ -72,7 +72,7 @@ function Element:New(Idx, Config)
 		}),
 	})
 
-	local SliderDisplay = New("TextLabel", {
+	local SliderDisplay = New("TextBox", {
 		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 		Text = "Value",
 		TextSize = 12,
@@ -83,6 +83,7 @@ function Element:New(Idx, Config)
 		Size = UDim2.new(0, 100, 0, 14),
 		Position = UDim2.new(0, -4, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
+		ClearTextOnFocus = false,
 		ThemeTag = {
 			TextColor3 = "SubText",
 		},
@@ -150,6 +151,15 @@ function Element:New(Idx, Config)
 			local SizeScale =
 				math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
 			Slider:SetValue(Slider.Min + ((Slider.Max - Slider.Min) * SizeScale))
+		end
+	end)
+
+	Creator.AddSignal(SliderDisplay.FocusLost, function(Enter)
+		local Number = tonumber(SliderDisplay.Text)
+		if Number then
+			Slider:SetValue(Number)
+		else
+			Slider:SetValue(Slider.Value)
 		end
 	end)
 

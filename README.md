@@ -17,9 +17,9 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] More Icons
 - [x] Divider Element
 - [x] Tab Badges
+- [x] Slider Input
 
 ### To-do
-- [ ] Slider Input
 - [ ] Theme Creator
 - [ ] Sub-tabs
 - [ ] Style Overhaul
