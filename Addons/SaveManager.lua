@@ -32,7 +32,7 @@ local SaveManager = {} do
 		},
 		Dropdown = {
 			Save = function(idx, object)
-				return { type = "Dropdown", idx = idx, value = object.Value, mutli = object.Multi }
+				return { type = "Dropdown", idx = idx, value = object.Value, multi = object.Multi }
 			end,
 			Load = function(idx, data)
 				if SaveManager.Options[idx] then 
@@ -107,7 +107,10 @@ local SaveManager = {} do
 			return false, "failed to encode data"
 		end
 
-		writefile(fullPath, encoded)
+		local writeSuccess, writeErr = pcall(writefile, fullPath, encoded)
+		if not writeSuccess then
+			return false, "failed to write file: " .. tostring(writeErr)
+		end
 		return true
 	end
 
@@ -157,6 +160,40 @@ local SaveManager = {} do
 		end
 	end
 
+	function SaveManager:GetOptions()
+		local file = self.Folder .. "/settings/options.json"
+		if isfile(file) then
+			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
+			if success then
+				return decoded
+			end
+		end
+
+		-- Legacy: migrate from autoload.txt
+		local legacyFile = self.Folder .. "/settings/autoload.txt"
+		if isfile(legacyFile) then
+			return { autoload = readfile(legacyFile), autosave = true }
+		end
+
+		return {}
+	end
+
+	function SaveManager:SetOption(key, value)
+		local options = self:GetOptions()
+		options[key] = value
+
+		local success, encoded = pcall(httpService.JSONEncode, httpService, options)
+		if success then
+			writefile(self.Folder .. "/settings/options.json", encoded)
+		end
+
+		-- Clean up legacy autoload.txt if present
+		local legacyFile = self.Folder .. "/settings/autoload.txt"
+		if isfile(legacyFile) then
+			pcall(delfile, legacyFile)
+		end
+	end
+
 	function SaveManager:RefreshConfigList()
 		local list = listfiles(self.Folder .. "/settings")
 
@@ -164,20 +201,9 @@ local SaveManager = {} do
 		for i = 1, #list do
 			local file = list[i]
 			if file:sub(-5) == ".json" then
-				local pos = file:find(".json", 1, true)
-				local start = pos
-
-				local char = file:sub(pos, pos)
-				while char ~= "/" and char ~= "\\" and char ~= "" do
-					pos = pos - 1
-					char = file:sub(pos, pos)
-				end
-
-				if char == "/" or char == "\\" then
-					local name = file:sub(pos + 1, start - 1)
-					if name ~= "options" and name ~= SaveManager.AutoSaveConfigName then
-						table.insert(out, name)
-					end
+				local name = file:match("[\\/]([^\\/]+)%.json$")
+				if name and name ~= "options" and name ~= SaveManager.AutoSaveConfigName then
+					table.insert(out, name)
 				end
 			end
 		end
@@ -201,49 +227,43 @@ local SaveManager = {} do
 			return
 		end
 
+		local options = self:GetOptions()
+
+		-- If autosave is disabled, don't load anything — start fresh
+		if options.autosave == false then
+			self.AutoSave = false
+			self._initialized = true
+			return
+		end
+
 		-- Try autoload first
-		local autoloadFile = self.Folder .. "/settings/autoload.txt"
-		if isfile(autoloadFile) then
-			local name = readfile(autoloadFile)
-			local success = self:Load(name)
-			if success then
-				self._initialized = true
-				self.Library:Notify({
-					Title = "Interface",
-					Content = "Config loader",
-					SubContent = string.format("Auto loaded config %q", name),
-					Duration = 7
-				})
-				return
+		if options.autoload then
+			local name = options.autoload
+			local configFile = self.Folder .. "/settings/" .. name .. ".json"
+			if isfile(configFile) then
+				local success = self:Load(name)
+				if success then
+					self._initialized = true
+					self.Library:Notify({
+						Title = "Interface",
+						Content = "Config loader",
+						SubContent = string.format("Auto loaded config %q", name),
+						Duration = 7
+					})
+					return
+				end
 			end
 		end
 
 		-- Fallback to autosave
-		local file = self.Folder .. "/settings/" .. self.AutoSaveConfigName .. ".json"
-		if isfile(file) then
-			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
-			if success and decoded.objects then
-				self._loading = true
-				local restored = 0
-				for _, option in next, decoded.objects do
-					if self.Parser[option.type] and not self.Ignore[option.idx] then
-						local ok = pcall(self.Parser[option.type].Load, option.idx, option)
-						if ok then
-							restored = restored + 1
-						end
-					end
-				end
-				self._loading = false
-
-				if restored > 0 and self.Library then
-					self.Library:Notify({
-						Title = "Interface",
-						Content = "Config loader",
-						SubContent = "Auto loaded last session",
-						Duration = 7
-					})
-				end
-			end
+		local success = self:Load(self.AutoSaveConfigName)
+		if success and self.Library then
+			self.Library:Notify({
+				Title = "Interface",
+				Content = "Config loader",
+				SubContent = "Auto loaded last session",
+				Duration = 7
+			})
 		end
 
 		self._initialized = true
@@ -470,7 +490,7 @@ local SaveManager = {} do
 				})
 			end
 
-			writefile(self.Folder .. "/settings/autoload.txt", name)
+			self:SetOption("autoload", name)
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
 			self.Library:Notify({
 				Title = "Interface",
@@ -480,15 +500,17 @@ local SaveManager = {} do
 			})
 		end})
 
-		if isfile(self.Folder .. "/settings/autoload.txt") then
-			local name = readfile(self.Folder .. "/settings/autoload.txt")
-			AutoloadButton:SetDesc("Current autoload config: " .. name)
+		do
+			local options = self:GetOptions()
+			if options.autoload then
+				AutoloadButton:SetDesc("Current autoload config: " .. options.autoload)
+			end
 		end
 
 		section:AddButton({Title = "Clear autoload", Callback = function()
-			local autoloadPath = self.Folder .. "/settings/autoload.txt"
-			if isfile(autoloadPath) then
-				delfile(autoloadPath)
+			local options = self:GetOptions()
+			if options.autoload then
+				self:SetOption("autoload", nil)
 				AutoloadButton:SetDesc("Current autoload config: none")
 				self.Library:Notify({
 					Title = "Interface",
@@ -499,19 +521,29 @@ local SaveManager = {} do
 			end
 		end})
 
-		section:AddToggle("SaveManager_AutoSave", {
-			Title = "Auto Save",
-			Description = "Automatically saves config on every change",
-			Default = true,
-			Callback = function(Value)
-				SaveManager.AutoSave = Value
-				if Value and SaveManager._initialized then
-					SaveManager:DoAutoSave()
+		do
+			local options = self:GetOptions()
+			section:AddToggle("SaveManager_AutoSave", {
+				Title = "Auto Save",
+				Description = "Automatically saves config on every change",
+				Default = options.autosave ~= false,
+				Callback = function(Value)
+					SaveManager.AutoSave = Value
+					SaveManager:SetOption("autosave", Value)
+					if Value and SaveManager._initialized then
+						SaveManager:DoAutoSave()
+					elseif not Value then
+						-- Delete autosave session file for a fresh start next time
+						local file = SaveManager.Folder .. "/settings/" .. SaveManager.AutoSaveConfigName .. ".json"
+						if isfile(file) then
+							pcall(delfile, file)
+						end
+					end
 				end
-			end
-		})
+			})
+		end
 
-		SaveManager:SetIgnoreIndexes({ "SaveManager_ConfigList", "SaveManager_ConfigName" })
+		SaveManager:SetIgnoreIndexes({ "SaveManager_ConfigList", "SaveManager_ConfigName", "SaveManager_AutoSave" })
 		SaveManager:SetupAutoSaveHooks()
 	end
 
