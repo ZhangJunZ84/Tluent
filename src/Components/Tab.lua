@@ -2,6 +2,7 @@ local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local Icons = require(Root.Icons)
+local TweenService = game:GetService("TweenService")
 
 local New = Creator.New
 local Spring = Flipper.Spring.new
@@ -16,6 +17,8 @@ local TabModule = {
 	TabCount = 0,
 }
 
+
+
 function TabModule:Init(Window)
 	TabModule.Window = Window
 	return TabModule
@@ -28,7 +31,8 @@ function TabModule:GetCurrentTabPos()
 	return TabPos - TabHolderPos
 end
 
-function TabModule:New(Title, Icon, Parent)
+function TabModule:New(Title, Icon, Parent, TabConfig)
+	TabConfig = TabConfig or {}
 	local Library = require(Root)
 	local Window = TabModule.Window
 	local Elements = Library.Elements
@@ -92,6 +96,66 @@ function TabModule:New(Title, Icon, Parent)
 		IconFrame,
 	})
 
+	local HasBorder = TabConfig.Border
+	if HasBorder == nil then
+		HasBorder = (Window.TabIndicator == "Border")
+	end
+
+	if HasBorder then
+		local BorderOptions = typeof(HasBorder) == "table" and HasBorder or {}
+		local Thickness = BorderOptions.Thickness or Window.TabIndicatorThickness or 0.5
+		local AlwaysVisible = BorderOptions.AlwaysVisible or false
+
+		-- Place the stroke inside an inner frame to align it perfectly inside the button
+		local InnerFrame = New("Frame", {
+			Size = UDim2.new(1, -2, 1, -2),
+			Position = UDim2.fromOffset(1, 1),
+			BackgroundTransparency = 1,
+			Parent = Tab.Frame,
+		}, {
+			New("UICorner", {
+				CornerRadius = UDim.new(0, 5),
+			}),
+		})
+
+		local BeamStroke = New("UIStroke", {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Thickness = Thickness,
+			Transparency = AlwaysVisible and 0.3 or 1,
+			Color = Creator.GetThemeProperty("Accent"),
+			Parent = InnerFrame,
+		})
+
+		Creator.AddThemeObject(BeamStroke, {
+			Color = "Accent",
+		})
+
+		Tab.BorderBeamStroke = BeamStroke
+		Tab.BorderBeamAlwaysVisible = AlwaysVisible
+		Tab.Hovered = false
+
+		function Tab:UpdateBeamVisibility()
+			if not Tab.BorderBeamStroke then return end
+			if Tab.BorderBeamAlwaysVisible then
+				TweenService:Create(Tab.BorderBeamStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Transparency = 0.3 }):Play()
+				return
+			end
+
+			local TargetTransparency = 1
+			if Tab.Selected then
+				TargetTransparency = 0.3
+			elseif Tab.Hovered then
+				TargetTransparency = 0.7
+			end
+
+			TweenService:Create(
+				Tab.BorderBeamStroke,
+				TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+				{ Transparency = TargetTransparency }
+			):Play()
+		end
+	end
+
 	local function UpdateTextLabelSize()
 		if not TextLabel then return end
 		if Tab.Badge and Tab.Badge.Frame then
@@ -139,9 +203,17 @@ function TabModule:New(Title, Icon, Parent)
 
 	Creator.AddSignal(Tab.Frame.MouseEnter, function()
 		Tab.SetTransparency(Tab.Selected and 0.85 or 0.89)
+		if Tab.UpdateBeamVisibility then
+			Tab.Hovered = true
+			Tab:UpdateBeamVisibility()
+		end
 	end)
 	Creator.AddSignal(Tab.Frame.MouseLeave, function()
 		Tab.SetTransparency(Tab.Selected and 0.89 or 1)
+		if Tab.UpdateBeamVisibility then
+			Tab.Hovered = false
+			Tab:UpdateBeamVisibility()
+		end
 	end)
 	Creator.AddSignal(Tab.Frame.MouseButton1Down, function()
 		Tab.SetTransparency(0.92)
@@ -475,9 +547,15 @@ function TabModule:SelectTab(Tab)
 	for _, TabObject in next, TabModule.Tabs do
 		TabObject.SetTransparency(1)
 		TabObject.Selected = false
+		if TabObject.UpdateBeamVisibility then
+			TabObject:UpdateBeamVisibility()
+		end
 	end
 	TabModule.Tabs[Tab].SetTransparency(0.89)
 	TabModule.Tabs[Tab].Selected = true
+	if TabModule.Tabs[Tab].UpdateBeamVisibility then
+		TabModule.Tabs[Tab]:UpdateBeamVisibility()
+	end
 
 	Window.TabDisplay.Text = TabModule.Tabs[Tab].Name
 	Window.SelectorPosMotor:setGoal(Spring(TabModule:GetCurrentTabPos(), { frequency = 6 }))

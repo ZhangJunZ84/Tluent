@@ -94,7 +94,11 @@ end
 function Creator.UpdateTheme()
 	for Instance, Object in next, Creator.Registry do
 		for Property, ColorIdx in next, Object.Properties do
-			Instance[Property] = Creator.GetThemeProperty(ColorIdx)
+			if type(ColorIdx) == "function" then
+				ColorIdx(Creator.GetThemeProperty)
+			else
+				Instance[Property] = Creator.GetThemeProperty(ColorIdx)
+			end
 		end
 	end
 

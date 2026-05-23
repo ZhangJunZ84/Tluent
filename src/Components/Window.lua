@@ -26,6 +26,8 @@ return function(Config)
 		CurrentPos = 0,
 		TabWidth = 0,
 		TabStyle = Config.TabStyle or "Tabs",
+		TabIndicator = Config.TabIndicator or "Line",
+		TabIndicatorThickness = Config.TabIndicatorThickness,
 		Position = UDim2.fromOffset(
 			Camera.ViewportSize.X / 2 - Config.Size.X.Offset / 2,
 			Camera.ViewportSize.Y / 2 - Config.Size.Y.Offset / 2
@@ -45,6 +47,7 @@ return function(Config)
 		BackgroundColor3 = Color3.fromRGB(76, 194, 255),
 		Position = UDim2.fromOffset(0, 17),
 		AnchorPoint = Vector2.new(0, 0.5),
+		Visible = Config.TabIndicator ~= "Border",
 		ThemeTag = {
 			BackgroundColor3 = "Accent",
 		},
@@ -71,6 +74,12 @@ return function(Config)
 	}, {
 		New("UIListLayout", {
 			Padding = UDim.new(0, 4),
+		}),
+		New("UIPadding", {
+			PaddingLeft = UDim.new(0, 1),
+			PaddingRight = UDim.new(0, 1),
+			PaddingTop = UDim.new(0, 1),
+			PaddingBottom = UDim.new(0, 1),
 		}),
 	})
 
@@ -396,7 +405,7 @@ return function(Config)
 
 	local TabModule = require(Components.Tab):Init(Window)
 	function Window:AddTab(TabConfig)
-		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)
+		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder, TabConfig)
 		if TabConfig.Badge then
 			Tab:AddBadge(TabConfig.Badge)
 		end

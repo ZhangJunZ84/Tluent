@@ -4,9 +4,11 @@ local InterfaceManager = loadstring(game:HttpGet("http://localhost:8642/Addons/I
 
 local Window = Fluent:CreateWindow({
     Title = "Tluent Library",
-    SubTitle = "",
+    SubTitle = "Something",
     SubTitlePosition = "Side", -- "Below" or "Side" (default)
     TabStyle = "Tabs", -- "Tabs" or "Icons"
+    TabIndicator = "Border", -- "Line" (default vertical indicator) or "Border" (solid accent border)
+    -- TabIndicatorThickness = 1, -- Default: 0.5
     TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -23,7 +25,6 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "globe" }),
-    -- You can add badges to tabs, and they can be updated using SetTitle and SetColor methods. Badges also support ColorSequences!
     IconTest = Window:AddTab({ 
         Title = "Icon Test", 
         Icon = "gravity:star-fill",
