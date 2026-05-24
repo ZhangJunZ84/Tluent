@@ -26,8 +26,7 @@ return function(Config)
 		CurrentPos = 0,
 		TabWidth = 0,
 		TabStyle = Config.TabStyle or "Tabs",
-		TabIndicator = Config.TabIndicator or "Line",
-		TabIndicatorThickness = Config.TabIndicatorThickness,
+
 		Position = UDim2.fromOffset(
 			Camera.ViewportSize.X / 2 - Config.Size.X.Offset / 2,
 			Camera.ViewportSize.Y / 2 - Config.Size.Y.Offset / 2

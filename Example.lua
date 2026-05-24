@@ -7,15 +7,11 @@ local Window = Fluent:CreateWindow({
     SubTitle = "Something",
     SubTitlePosition = "Side", -- "Below" or "Side" (default)
     TabStyle = "Tabs", -- "Tabs" or "Icons"
-    TabIndicator = "Border", -- "Line" (default vertical indicator) or "Border" (solid accent border)
-    -- TabIndicatorThickness = 1, -- Default: 0.5
     TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
     Transparency = false,
     Theme = "Dark", -- You can use presets like Dark, Light, Aqua, etc.
-    SeedColor = Color3.fromRGB(96, 205, 255), -- Or use a custom SeedColor for dynamic Material Design 3 generation!
-    DarkMode = true,
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 

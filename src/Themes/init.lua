@@ -6,6 +6,7 @@ local Presets = {
 	Aqua = { Seed = Color3.fromRGB(0, 255, 255), IsDark = true },
 	Amethyst = { Seed = Color3.fromRGB(155, 89, 182), IsDark = true },
 	Rose = { Seed = Color3.fromRGB(255, 0, 127), IsDark = true },
+	Sakura = { Seed = Color3.fromRGB(255, 183, 197), IsDark = false },
 	Emerald = { Seed = Color3.fromRGB(46, 204, 113), IsDark = true },
 }
 
