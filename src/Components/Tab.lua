@@ -90,7 +90,7 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(1, 0), -- MD3 perfectly rounded pill
+			CornerRadius = UDim.new(0, 12), -- Sleek modern rounded corners
 		}),
 		TextLabel,
 		IconFrame,

@@ -2,6 +2,7 @@ local MaterialColor = require(script.MaterialColor)
 
 local Presets = {
 	Dark = { Seed = Color3.fromRGB(0, 162, 255), IsDark = true },
+	Darker = { Seed = Color3.fromRGB(128, 128, 128), IsDark = true },
 	Light = { Seed = Color3.fromRGB(0, 162, 255), IsDark = false },
 	Aqua = { Seed = Color3.fromRGB(0, 255, 255), IsDark = true },
 	Amethyst = { Seed = Color3.fromRGB(155, 89, 182), IsDark = true },

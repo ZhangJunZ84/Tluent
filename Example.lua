@@ -180,6 +180,7 @@ do
         Description = "You can select multiple values.",
         Values = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"},
         Multi = true,
+        Search = true,
         Default = {"seven", "twelve"},
     })
 

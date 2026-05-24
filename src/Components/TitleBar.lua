@@ -243,7 +243,7 @@ return function(Config)
 			end
 		end
 
-		local Radius = math.clamp(Config.Radius or 4, 0, 13)
+		local Radius = math.clamp(Config.Radius or 6, 0, 13)
 
 		local StrokeColor, StrokeThemeTag
 		if UseTheme then
@@ -258,7 +258,7 @@ return function(Config)
 
 		local Children = {
 			New("UICorner", {
-				CornerRadius = UDim.new(1, 0), -- MD3 pill shape
+				CornerRadius = UDim.new(0, Radius),
 			}),
 			New("UIPadding", {
 				PaddingLeft = UDim.new(0, 8),

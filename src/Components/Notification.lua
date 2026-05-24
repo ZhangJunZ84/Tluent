@@ -199,7 +199,7 @@ function Notification:New(Config)
 
 	function NewNotification:Open()
 		local ContentSize = NewNotification.LabelHolder.AbsoluteSize.Y
-		NewNotification.Holder.Size = UDim2.new(1, 0, 0, 58 + ContentSize)
+		NewNotification.Holder.Size = UDim2.new(1, 0, 0, 64 + ContentSize)
 
 		RootMotor:setGoal({
 			Scale = Spring(0, { frequency = 5 }),
