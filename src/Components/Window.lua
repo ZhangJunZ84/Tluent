@@ -98,17 +98,11 @@ return function(Config)
 		BackgroundTransparency = 1,
 	})
 
-	Window.ContainerAnim = New("CanvasGroup", {
-		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
-	})
-
 	Window.ContainerCanvas = New("Frame", {
 		Size = UDim2.new(1, -Window.TabWidth - 32, 1, -(102 + BarOffset)),
 		Position = UDim2.fromOffset(Window.TabWidth + 26, 90 + BarOffset),
 		BackgroundTransparency = 1,
 	}, {
-		Window.ContainerAnim,
 		Window.ContainerHolder
 	})
 
@@ -147,26 +141,12 @@ return function(Config)
 		Y = Window.Position.Y.Offset,
 	})
 
-	Window.ContainerBackMotor = Flipper.SingleMotor.new(0)
-	Window.ContainerPosMotor = Flipper.SingleMotor.new(94 + BarOffset)
-
 	SizeMotor:onStep(function(values)
 		Window.Root.Size = UDim2.new(0, values.X, 0, values.Y)
 	end)
 
 	PosMotor:onStep(function(values)
 		Window.Root.Position = UDim2.new(0, values.X, 0, values.Y)
-	end)
-
-	local LastValue = 0
-	local LastTime = 0
-
-	Window.ContainerBackMotor:onStep(function(Value)
-		Window.ContainerAnim.GroupTransparency = Value
-	end)
-
-	Window.ContainerPosMotor:onStep(function(Value)
-		Window.ContainerAnim.Position = UDim2.fromOffset(0, Value)
 	end)
 
 	local OldSizeX

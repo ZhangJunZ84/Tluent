@@ -76,69 +76,29 @@ Creator.Typography = {
 }
 
 function Creator.CreateRipple(Button)
-	local Mouse = game:GetService("Players").LocalPlayer:GetMouse()
 	Creator.AddSignal(Button.MouseButton1Down, function()
 		local TweenService = game:GetService("TweenService")
-		local RunService = game:GetService("RunService")
-		local AbsoluteSize = Button.AbsoluteSize
-		local AbsolutePosition = Button.AbsolutePosition
-		if AbsoluteSize.X == 0 then return end
-		local MaxSize = math.max(AbsoluteSize.X, AbsoluteSize.Y) * 1.5
-
-		local ScreenGui = Button:FindFirstAncestorOfClass("ScreenGui")
-		if not ScreenGui then return end
-
+		
 		local parentCorner = Button:FindFirstChildOfClass("UICorner")
 		local cornerRadius = parentCorner and parentCorner.CornerRadius or UDim.new(0, 8)
 
-		-- Create ripple in ScreenGui to completely escape the AutomaticSize hierarchy
-		local RippleHolder = Creator.New("CanvasGroup", {
-			Name = "RippleHolder",
-			Parent = ScreenGui,
-			Size = UDim2.fromOffset(AbsoluteSize.X, AbsoluteSize.Y),
-			Position = UDim2.fromOffset(AbsolutePosition.X, AbsolutePosition.Y),
-			BackgroundTransparency = 1,
-			ZIndex = 100
+		local Overlay = Creator.New("Frame", {
+			Name = "ClickIndicator",
+			Parent = Button,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 0.7,
+			ZIndex = 100,
 		})
-		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = RippleHolder })
+		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = Overlay })
+		Creator.AddThemeObject(Overlay, { BackgroundColor3 = "OnSurface" })
 
-		local clickOffsetX = Mouse.X - AbsolutePosition.X
-		local clickOffsetY = Mouse.Y - AbsolutePosition.Y
-
-		local Circle = Creator.New("Frame", {
-			Name = "Ripple",
-			Parent = RippleHolder,
-			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-			BackgroundTransparency = 0.6,
-			ZIndex = 101,
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.fromOffset(clickOffsetX, clickOffsetY),
-			Size = UDim2.fromOffset(0, 0)
-		})
-		Creator.New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = Circle })
-		Creator.AddThemeObject(Circle, { BackgroundColor3 = "OnSurface" })
-
-		-- Sync position with Button if user scrolls
-		local Connection
-		Connection = RunService.RenderStepped:Connect(function()
-			if not Button.Parent then
-				Connection:Disconnect()
-				RippleHolder:Destroy()
-				return
-			end
-			RippleHolder.Position = UDim2.fromOffset(Button.AbsolutePosition.X, Button.AbsolutePosition.Y)
-			RippleHolder.Size = UDim2.fromOffset(Button.AbsoluteSize.X, Button.AbsoluteSize.Y)
-		end)
-
-		local Tween = TweenService:Create(Circle, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-			Size = UDim2.fromOffset(MaxSize, MaxSize),
+		local Tween = TweenService:Create(Overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			BackgroundTransparency = 1
 		})
 		Tween:Play()
 		
 		Tween.Completed:Connect(function() 
-			if Connection then Connection:Disconnect() end
-			RippleHolder:Destroy() 
+			Overlay:Destroy() 
 		end)
 	end)
 end
@@ -198,7 +158,13 @@ end
 
 function Creator.OverrideTag(Object, Properties)
 	Creator.Registry[Object].Properties = Properties
-	Creator.UpdateTheme()
+	for Property, ColorIdx in next, Properties do
+		if type(ColorIdx) == "function" then
+			ColorIdx(Creator.GetThemeProperty)
+		else
+			Object[Property] = Creator.GetThemeProperty(ColorIdx)
+		end
+	end
 end
 
 function Creator.New(Name, Properties, Children)

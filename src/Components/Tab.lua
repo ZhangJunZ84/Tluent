@@ -481,6 +481,10 @@ end
 function TabModule:SelectTab(Tab)
 	local Window = TabModule.Window
 
+	if TabModule.SelectedTab == Tab then
+		return
+	end
+
 	TabModule.SelectedTab = Tab
 
 	for _, TabObject in next, TabModule.Tabs do
@@ -511,21 +515,10 @@ function TabModule:SelectTab(Tab)
 
 	Window.TabDisplay.Text = TabModule.Tabs[Tab].Name
 
-	task.spawn(function()
-		Window.ContainerHolder.Parent = Window.ContainerAnim
-		
-		Window.ContainerPosMotor:setGoal(Spring(15, { frequency = 10 }))
-		Window.ContainerBackMotor:setGoal(Spring(1, { frequency = 10 }))
-		task.wait(0.12)
-		for _, Container in next, TabModule.Containers do
-			Container.Visible = false
-		end
-		TabModule.Containers[Tab].Visible = true
-		Window.ContainerPosMotor:setGoal(Spring(0, { frequency = 5 }))
-		Window.ContainerBackMotor:setGoal(Spring(0, { frequency = 8 }))
-		task.wait(0.12)
-		Window.ContainerHolder.Parent = Window.ContainerCanvas
-	end)
+	for _, Container in next, TabModule.Containers do
+		Container.Visible = false
+	end
+	TabModule.Containers[Tab].Visible = true
 end
 
 return TabModule
