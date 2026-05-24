@@ -34,14 +34,16 @@ function Element:New(Idx, Config)
 	Slider.SetTitle = SliderFrame.SetTitle
 	Slider.SetDesc = SliderFrame.SetDesc
 
-	local SliderDot = New("ImageLabel", {
+	local SliderDot = New("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, -7, 0.5, 0),
-		Size = UDim2.fromOffset(14, 14),
-		Image = "http://www.roblox.com/asset/?id=12266946128",
+		Position = UDim2.new(0, -10, 0.5, 0),
+		Size = UDim2.fromOffset(20, 20),
+		BackgroundColor3 = Color3.new(1, 1, 1),
 		ThemeTag = {
-			ImageColor3 = "Accent",
+			BackgroundColor3 = "Primary",
 		},
+	}, {
+		New("UICorner", { CornerRadius = UDim.new(1, 0) })
 	})
 
 	local SliderHitbox = New("TextButton", {
@@ -64,7 +66,7 @@ function Element:New(Idx, Config)
 	local SliderFill = New("Frame", {
 		Size = UDim2.new(0, 0, 1, 0),
 		ThemeTag = {
-			BackgroundColor3 = "Accent",
+			BackgroundColor3 = "Primary",
 		},
 	}, {
 		New("UICorner", {
@@ -73,9 +75,9 @@ function Element:New(Idx, Config)
 	})
 
 	local SliderDisplay = New("TextBox", {
-		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Medium),
 		Text = "Value",
-		TextSize = 12,
+		TextSize = 14,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Right,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -90,10 +92,10 @@ function Element:New(Idx, Config)
 	})
 
 	local SliderInner = New("Frame", {
-		Size = UDim2.new(1, 0, 0, 4),
+		Size = UDim2.new(1, 0, 0, 6),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
-		BackgroundTransparency = 0.4,
+		BackgroundTransparency = 0,
 		Parent = SliderFrame.Frame,
 		ThemeTag = {
 			BackgroundColor3 = "SliderRail",
@@ -170,7 +172,7 @@ function Element:New(Idx, Config)
 
 	function Slider:SetValue(Value)
 		self.Value = Library:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding)
-		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, 0)
+		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -10, 0.5, 0)
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)
 

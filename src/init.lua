@@ -116,7 +116,17 @@ function Library:CreateWindow(Config)
 	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
 	Library.UseAcrylic = Config.Acrylic or false
 	Library.Acrylic = Config.Acrylic or false
-	Library.Theme = Config.Theme or "Dark"
+	if Config.SeedColor then
+		local MaterialColor = require(Root.Themes.MaterialColor)
+		local CustomTheme = MaterialColor.Generate(Config.SeedColor, Config.DarkMode == nil and true or Config.DarkMode)
+		CustomTheme.Name = "Custom"
+		require(Root.Themes)["Custom"] = CustomTheme
+		table.insert(Library.Themes, "Custom")
+		Library.Theme = "Custom"
+	else
+		Library.Theme = Config.Theme or "Dark"
+	end
+
 	Library.Transparency = Config.Transparency == nil and true or Config.Transparency
 	if Config.Acrylic then
 		Acrylic.init()
@@ -135,7 +145,7 @@ function Library:CreateWindow(Config)
 	})
 
 	Library.Window = Window
-	Library:SetTheme(Config.Theme)
+	Library:SetTheme(Library.Theme)
 	Library:ToggleTransparency(Library.Transparency)
 
 	return Window

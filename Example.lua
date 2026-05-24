@@ -13,7 +13,9 @@ local Window = Fluent:CreateWindow({
     Size = UDim2.fromOffset(520, 400),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
     Transparency = false,
-    Theme = "Dark",
+    Theme = "Dark", -- You can use presets like Dark, Light, Aqua, etc.
+    SeedColor = Color3.fromRGB(96, 205, 255), -- Or use a custom SeedColor for dynamic Material Design 3 generation!
+    DarkMode = true,
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 
