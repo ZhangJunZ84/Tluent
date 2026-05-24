@@ -50,14 +50,14 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 
 	local IconObject = Icons.Image({
 		Icon = Icon,
-		Size = UDim2.fromOffset(16, 16),
-		Colors = { "Text" }
+		Size = UDim2.fromOffset(18, 18),
+		Colors = { "Tab" }
 	})
 	local IconFrame = IconObject.IconFrame
 	IconFrame.AnchorPoint = IsIconMode and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
-	IconFrame.Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 8, 0.5, 0)
+	IconFrame.Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 12, 0.5, 0)
 
-	local LabelOffset = Icon and 30 or 12
+	local LabelOffset = Icon and 36 or 12
 	local LabelRightPadding = 12
 	local TextLabel = not IsIconMode and New("TextLabel", {
 		AnchorPoint = Vector2.new(0, 0.5),
@@ -67,94 +67,36 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextTransparency = 0,
 		FontFace = Font.new(
-			"rbxasset://fonts/families/GothamSSm.json",
-			Enum.FontWeight.Regular,
+			"rbxasset://fonts/families/Roboto.json",
+			Enum.FontWeight.Medium,
 			Enum.FontStyle.Normal
 		),
-		TextSize = 12,
+		TextSize = 14,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
 		Size = UDim2.new(1, -LabelOffset - LabelRightPadding, 1, 0),
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			TextColor3 = "Text",
+			TextColor3 = "Tab",
 		},
 	}) or nil
 
 	Tab.Frame = New("TextButton", {
-		Size = UDim2.new(1, 0, 0, 34),
+		Size = UDim2.new(1, 0, 0, 40),
 		BackgroundTransparency = 1,
 		Parent = Parent,
 		ThemeTag = {
-			BackgroundColor3 = "Tab",
+			BackgroundColor3 = "SecondaryContainer",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 6),
+			CornerRadius = UDim.new(1, 0), -- MD3 perfectly rounded pill
 		}),
 		TextLabel,
 		IconFrame,
 	})
 
-	local HasBorder = TabConfig.Border
-	if HasBorder == nil then
-		HasBorder = (Window.TabIndicator == "Border")
-	end
-
-	if HasBorder then
-		local BorderOptions = typeof(HasBorder) == "table" and HasBorder or {}
-		local Thickness = BorderOptions.Thickness or Window.TabIndicatorThickness or 0.5
-		local AlwaysVisible = BorderOptions.AlwaysVisible or false
-
-		-- Place the stroke inside an inner frame to align it perfectly inside the button
-		local InnerFrame = New("Frame", {
-			Size = UDim2.new(1, -2, 1, -2),
-			Position = UDim2.fromOffset(1, 1),
-			BackgroundTransparency = 1,
-			Parent = Tab.Frame,
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0, 5),
-			}),
-		})
-
-		local BeamStroke = New("UIStroke", {
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Thickness = Thickness,
-			Transparency = AlwaysVisible and 0.3 or 1,
-			Color = Creator.GetThemeProperty("Accent"),
-			Parent = InnerFrame,
-		})
-
-		Creator.AddThemeObject(BeamStroke, {
-			Color = "Accent",
-		})
-
-		Tab.BorderBeamStroke = BeamStroke
-		Tab.BorderBeamAlwaysVisible = AlwaysVisible
-		Tab.Hovered = false
-
-		function Tab:UpdateBeamVisibility()
-			if not Tab.BorderBeamStroke then return end
-			if Tab.BorderBeamAlwaysVisible then
-				TweenService:Create(Tab.BorderBeamStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Transparency = 0.3 }):Play()
-				return
-			end
-
-			local TargetTransparency = 1
-			if Tab.Selected then
-				TargetTransparency = 0.3
-			elseif Tab.Hovered then
-				TargetTransparency = 0.7
-			end
-
-			TweenService:Create(
-				Tab.BorderBeamStroke,
-				TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-				{ Transparency = TargetTransparency }
-			):Play()
-		end
-	end
+	Tab.Hovered = false
 
 	local function UpdateTextLabelSize()
 		if not TextLabel then return end
@@ -202,24 +144,27 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 	Tab.Motor, Tab.SetTransparency = Creator.SpringMotor(1, Tab.Frame, "BackgroundTransparency")
 
 	Creator.AddSignal(Tab.Frame.MouseEnter, function()
-		Tab.SetTransparency(Tab.Selected and 0.85 or 0.89)
-		if Tab.UpdateBeamVisibility then
-			Tab.Hovered = true
-			Tab:UpdateBeamVisibility()
+		Tab.Hovered = true
+		if not Tab.Selected then
+			Tab.SetTransparency(0.92)
 		end
 	end)
 	Creator.AddSignal(Tab.Frame.MouseLeave, function()
-		Tab.SetTransparency(Tab.Selected and 0.89 or 1)
-		if Tab.UpdateBeamVisibility then
-			Tab.Hovered = false
-			Tab:UpdateBeamVisibility()
+		Tab.Hovered = false
+		if not Tab.Selected then
+			Tab.SetTransparency(1)
 		end
 	end)
 	Creator.AddSignal(Tab.Frame.MouseButton1Down, function()
-		Tab.SetTransparency(0.92)
+		if not Tab.Selected then
+			Tab.SetTransparency(0.85)
+		end
+		Creator.CreateRipple(Tab.Frame)
 	end)
 	Creator.AddSignal(Tab.Frame.MouseButton1Up, function()
-		Tab.SetTransparency(Tab.Selected and 0.85 or 0.89)
+		if not Tab.Selected then
+			Tab.SetTransparency(Tab.Hovered and 0.92 or 1)
+		end
 	end)
 	Creator.AddSignal(Tab.Frame.MouseButton1Click, function()
 		TabModule:SelectTab(TabIndex)
@@ -296,20 +241,13 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 
 		local Children = {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, Radius),
+				CornerRadius = UDim.new(1, 0), -- MD3 pill shape
 			}),
 			New("UIPadding", {
 				PaddingLeft = UDim.new(0, 4),
 				PaddingRight = UDim.new(0, 4),
 				PaddingTop = UDim.new(0, 2),
 				PaddingBottom = UDim.new(0, 2),
-			}),
-			New("UIStroke", {
-				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-				Thickness = 1,
-				Transparency = UseTheme and 0.6 or 0.7,
-				Color = StrokeColor,
-				ThemeTag = StrokeThemeTag,
 			}),
 			New("UIListLayout", {
 				Padding = UDim.new(0, 3),
@@ -362,11 +300,11 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		table.insert(Children, New("TextLabel", {
 			Text = Config.Title or "",
 			FontFace = Font.new(
-				"rbxasset://fonts/families/GothamSSm.json",
-				Enum.FontWeight.SemiBold,
+				"rbxasset://fonts/families/Roboto.json",
+				Enum.FontWeight.Medium,
 				Enum.FontStyle.Normal
 			),
-			TextSize = 9,
+			TextSize = 10,
 			TextColor3 = LabelColor,
 			ThemeTag = LabelThemeTag,
 			BackgroundTransparency = 1,
@@ -547,18 +485,30 @@ function TabModule:SelectTab(Tab)
 	for _, TabObject in next, TabModule.Tabs do
 		TabObject.SetTransparency(1)
 		TabObject.Selected = false
-		if TabObject.UpdateBeamVisibility then
-			TabObject:UpdateBeamVisibility()
+		local TextLabel = TabObject.Frame:FindFirstChildOfClass("TextLabel")
+		local IconFrame = TabObject.Frame:FindFirstChild("IconFrame")
+		
+		if TextLabel then
+			Creator.OverrideTag(TextLabel, { TextColor3 = "Tab" })
+		end
+		if IconFrame and IconFrame:FindFirstChild("Icon") then
+			Creator.OverrideTag(IconFrame.Icon, { ImageColor3 = "Tab" })
 		end
 	end
-	TabModule.Tabs[Tab].SetTransparency(0.89)
+	
+	TabModule.Tabs[Tab].SetTransparency(0)
 	TabModule.Tabs[Tab].Selected = true
-	if TabModule.Tabs[Tab].UpdateBeamVisibility then
-		TabModule.Tabs[Tab]:UpdateBeamVisibility()
+	
+	local SelectedTextLabel = TabModule.Tabs[Tab].Frame:FindFirstChildOfClass("TextLabel")
+	local SelectedIconFrame = TabModule.Tabs[Tab].Frame:FindFirstChild("IconFrame")
+	if SelectedTextLabel then
+		Creator.OverrideTag(SelectedTextLabel, { TextColor3 = "OnSecondaryContainer" })
+	end
+	if SelectedIconFrame and SelectedIconFrame:FindFirstChild("Icon") then
+		Creator.OverrideTag(SelectedIconFrame.Icon, { ImageColor3 = "OnSecondaryContainer" })
 	end
 
 	Window.TabDisplay.Text = TabModule.Tabs[Tab].Name
-	Window.SelectorPosMotor:setGoal(Spring(TabModule:GetCurrentTabPos(), { frequency = 6 }))
 
 	task.spawn(function()
 		Window.ContainerHolder.Parent = Window.ContainerAnim

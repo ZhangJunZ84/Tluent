@@ -42,21 +42,6 @@ return function(Config)
 	local DefaultTabWidth = Window.TabStyle == "Icons" and 36 or 120
 	Window.TabWidth = Config.TabWidth or DefaultTabWidth
 
-	local Selector = New("Frame", {
-		Size = UDim2.fromOffset(4, 0),
-		BackgroundColor3 = Color3.fromRGB(76, 194, 255),
-		Position = UDim2.fromOffset(0, 17),
-		AnchorPoint = Vector2.new(0, 0.5),
-		Visible = Config.TabIndicator ~= "Border",
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		}),
-	})
-
 	local ResizeStartFrame = New("Frame", {
 		Size = UDim2.fromOffset(20, 20),
 		BackgroundTransparency = 1,
@@ -89,8 +74,7 @@ return function(Config)
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 	}, {
-		Window.TabHolder,
-		Selector,
+		Window.TabHolder
 	})
 
 	Window.TabDisplay = New("TextLabel", {
@@ -163,8 +147,6 @@ return function(Config)
 		Y = Window.Position.Y.Offset,
 	})
 
-	Window.SelectorPosMotor = Flipper.SingleMotor.new(17 + BarOffset)
-	Window.SelectorSizeMotor = Flipper.SingleMotor.new(0)
 	Window.ContainerBackMotor = Flipper.SingleMotor.new(0)
 	Window.ContainerPosMotor = Flipper.SingleMotor.new(94 + BarOffset)
 
@@ -178,21 +160,6 @@ return function(Config)
 
 	local LastValue = 0
 	local LastTime = 0
-	Window.SelectorPosMotor:onStep(function(Value)
-		Selector.Position = UDim2.new(0, 0, 0, Value + 17 + BarOffset)
-		local Now = tick()
-		local DeltaTime = Now - LastTime
-
-		if LastValue ~= nil then
-			Window.SelectorSizeMotor:setGoal(Spring((math.abs(Value - LastValue) / (DeltaTime * 60)) + 16))
-			LastValue = Value
-		end
-		LastTime = Now
-	end)
-
-	Window.SelectorSizeMotor:onStep(function(Value)
-		Selector.Size = UDim2.new(0, 4, 0, Value)
-	end)
 
 	Window.ContainerBackMotor:onStep(function(Value)
 		Window.ContainerAnim.GroupTransparency = Value
@@ -355,19 +322,23 @@ return function(Config)
 		Dialog.Title.Text = Config.Title
 
 		local Content = New("TextLabel", {
-			FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+			FontFace = Font.new(
+				"rbxasset://fonts/families/Roboto.json",
+				Enum.FontWeight.Regular,
+				Enum.FontStyle.Normal
+			),
 			Text = Config.Content,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
 			TextSize = 14,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
-			Size = UDim2.new(1, -40, 1, 0),
-			Position = UDim2.fromOffset(20, 60),
+			Size = UDim2.new(1, -48, 1, 0),
+			Position = UDim2.fromOffset(24, 64),
 			BackgroundTransparency = 1,
 			Parent = Dialog.Root,
 			ClipsDescendants = false,
 			ThemeTag = {
-				TextColor3 = "Text",
+				TextColor3 = "SubText", -- MD3 Body uses OnSurfaceVariant (SubText)
 			},
 		})
 
@@ -415,12 +386,6 @@ return function(Config)
 	function Window:SelectTab(Tab)
 		TabModule:SelectTab(Tab)
 	end
-
-	Creator.AddSignal(Window.TabHolder:GetPropertyChangedSignal("CanvasPosition"), function()
-		LastValue = TabModule:GetCurrentTabPos() + 16
-		LastTime = 0
-		Window.SelectorPosMotor:setGoal(Instant(TabModule:GetCurrentTabPos()))
-	end)
 
 	return Window
 end

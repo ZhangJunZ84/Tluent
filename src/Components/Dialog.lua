@@ -55,31 +55,23 @@ function Dialog:Create()
 	NewDialog.ButtonHolderFrame = New("Frame", {
 		Size = UDim2.new(1, 0, 0, 70),
 		Position = UDim2.new(0, 0, 1, -70),
-		ThemeTag = {
-			BackgroundColor3 = "DialogHolder",
-		},
+		BackgroundTransparency = 1,
 	}, {
-		New("Frame", {
-			Size = UDim2.new(1, 0, 0, 1),
-			ThemeTag = {
-				BackgroundColor3 = "DialogHolderLine",
-			},
-		}),
 		NewDialog.ButtonHolder,
 	})
 
 	NewDialog.Title = New("TextLabel", {
 		FontFace = Font.new(
-			"rbxasset://fonts/families/GothamSSm.json",
+			"rbxasset://fonts/families/Roboto.json",
 			Enum.FontWeight.SemiBold,
 			Enum.FontStyle.Normal
 		),
 		Text = "Dialog",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 22,
+		TextSize = 24, -- MD3 Headline size
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Size = UDim2.new(1, 0, 0, 22),
-		Position = UDim2.fromOffset(20, 25),
+		Size = UDim2.new(1, 0, 0, 24),
+		Position = UDim2.fromOffset(24, 24),
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,
 		ThemeTag = {
@@ -104,7 +96,7 @@ function Dialog:Create()
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 24), -- MD3 standard dialog radius
 		}),
 		New("UIStroke", {
 			Transparency = 0.5,
