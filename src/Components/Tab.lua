@@ -143,6 +143,8 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 
 	Tab.Motor, Tab.SetTransparency = Creator.SpringMotor(1, Tab.Frame, "BackgroundTransparency")
 
+	Creator.CreateRipple(Tab.Frame)
+
 	Creator.AddSignal(Tab.Frame.MouseEnter, function()
 		Tab.Hovered = true
 		if not Tab.Selected then
@@ -159,7 +161,6 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		if not Tab.Selected then
 			Tab.SetTransparency(0.85)
 		end
-		Creator.CreateRipple(Tab.Frame)
 	end)
 	Creator.AddSignal(Tab.Frame.MouseButton1Up, function()
 		if not Tab.Selected then
