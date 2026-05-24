@@ -27,20 +27,20 @@ return function(Config)
 	local Library = require(Root)
 
 	local SubTitleBelow = Config.SubTitlePosition == "Below"
-	local BarHeight = 42
+	local BarHeight = 48
 
 	TitleBar.TitleLabel = New("TextLabel", {
 		RichText = true,
 		Text = Config.Title,
 		FontFace = Font.new(
-			"rbxasset://fonts/families/GothamSSm.json",
-			Enum.FontWeight.Regular,
+			"rbxasset://fonts/families/Roboto.json",
+			Enum.FontWeight.SemiBold,
 			Enum.FontStyle.Normal
 		),
-		TextSize = Config.TitleSize or 13,
+		TextSize = Config.TitleSize or 16,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
-		Size = SubTitleBelow and UDim2.new(0, 0, 0, 13) or UDim2.fromScale(0, 1),
+		Size = SubTitleBelow and UDim2.new(0, 0, 0, 16) or UDim2.fromScale(0, 1),
 		AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
 		BackgroundTransparency = 1,
 		ThemeTag = {
@@ -53,11 +53,11 @@ return function(Config)
 		Text = Config.SubTitle,
 		TextTransparency = 0.4,
 		FontFace = Font.new(
-			"rbxasset://fonts/families/GothamSSm.json",
-			Enum.FontWeight.Regular,
+			"rbxasset://fonts/families/Roboto.json",
+			Enum.FontWeight.Medium,
 			Enum.FontStyle.Normal
 		),
-		TextSize = SubTitleBelow and 11 or 13,
+		TextSize = SubTitleBelow and 12 or 14,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
 		Size = SubTitleBelow and UDim2.new(0, 0, 0, 12) or UDim2.fromScale(0, 1),
@@ -74,7 +74,7 @@ return function(Config)
 		}
 
 		Button.Frame = New("TextButton", {
-			Size = UDim2.new(0, 34, 1, -8),
+			Size = UDim2.new(0, 36, 1, -12),
 			AnchorPoint = Vector2.new(1, 0),
 			BackgroundTransparency = 1,
 			Parent = Parent,
@@ -85,11 +85,11 @@ return function(Config)
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 7),
+				CornerRadius = UDim.new(1, 0), -- MD3 circular hover states
 			}),
 			New("ImageLabel", {
 				Image = Icon,
-				Size = UDim2.fromOffset(16, 16),
+				Size = UDim2.fromOffset(18, 18),
 				Position = UDim2.fromScale(0.5, 0.5),
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				BackgroundTransparency = 1,
@@ -127,16 +127,16 @@ return function(Config)
 			end)
 		else
 			AddSignal(Button.Frame.MouseEnter, function()
-				SetTransparency(0.94)
+				SetTransparency(0.92)
 			end)
 			AddSignal(Button.Frame.MouseLeave, function()
 				SetTransparency(1, true)
 			end)
 			AddSignal(Button.Frame.MouseButton1Down, function()
-				SetTransparency(0.96)
+				SetTransparency(0.88)
 			end)
 			AddSignal(Button.Frame.MouseButton1Up, function()
-				SetTransparency(0.94)
+				SetTransparency(0.92)
 			end)
 		end
 
@@ -161,7 +161,7 @@ return function(Config)
 			ClipsDescendants = true,
 		}, {
 			New("UIListLayout", {
-				Padding = UDim.new(0, 8),
+				Padding = UDim.new(0, 10),
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -172,7 +172,7 @@ return function(Config)
 				BackgroundTransparency = 1,
 			}, {
 				New("UIListLayout", {
-					Padding = UDim.new(0, SubTitleBelow and 1 or 5),
+					Padding = UDim.new(0, SubTitleBelow and 2 or 6),
 					FillDirection = SubTitleBelow and Enum.FillDirection.Vertical or Enum.FillDirection.Horizontal,
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -182,15 +182,7 @@ return function(Config)
 
 			}),
 			TitleBar.TagsFrame,
-		}),
-		New("Frame", {
-			BackgroundTransparency = 0.5,
-			Size = UDim2.new(1, 0, 0, 1),
-			Position = UDim2.new(0, 0, 1, 0),
-			ThemeTag = {
-				BackgroundColor3 = "TitleBarLine",
-			},
-		}),
+		})
 	})
 
 	TitleBar.CloseButton = BarButton(Assets.Close, UDim2.new(1, -4, 0, 4), TitleBar.Frame, function()
@@ -251,7 +243,7 @@ return function(Config)
 			end
 		end
 
-		local Radius = math.clamp(Config.Radius or 4, 0, 13)
+		local Radius = math.clamp(Config.Radius or 6, 0, 13)
 
 		local StrokeColor, StrokeThemeTag
 		if UseTheme then
@@ -269,17 +261,10 @@ return function(Config)
 				CornerRadius = UDim.new(0, Radius),
 			}),
 			New("UIPadding", {
-				PaddingLeft = UDim.new(0, 6),
-				PaddingRight = UDim.new(0, 6),
-				PaddingTop = UDim.new(0, 3),
-				PaddingBottom = UDim.new(0, 3),
-			}),
-			New("UIStroke", {
-				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-				Thickness = 1,
-				Transparency = UseTheme and 0.6 or 0.7,
-				Color = StrokeColor,
-				ThemeTag = StrokeThemeTag,
+				PaddingLeft = UDim.new(0, 8),
+				PaddingRight = UDim.new(0, 8),
+				PaddingTop = UDim.new(0, 4),
+				PaddingBottom = UDim.new(0, 4),
 			}),
 			New("UIListLayout", {
 				Padding = UDim.new(0, 4),

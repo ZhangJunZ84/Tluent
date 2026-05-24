@@ -25,36 +25,40 @@ function Element:New(Idx, Config)
 	Toggle.SetTitle = ToggleFrame.SetTitle
 	Toggle.SetDesc = ToggleFrame.SetDesc
 
-	local ToggleCircle = New("ImageLabel", {
+	local ToggleCircle = New("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Size = UDim2.fromOffset(14, 14),
-		Position = UDim2.new(0, 2, 0.5, 0),
-		Image = "http://www.roblox.com/asset/?id=12266946128",
-		ImageTransparency = 0.5,
+		Size = UDim2.fromOffset(16, 16),
+		Position = UDim2.new(0, 4, 0.5, 0),
+		BackgroundColor3 = Color3.new(1, 1, 1),
 		ThemeTag = {
-			ImageColor3 = "ToggleSlider",
+			BackgroundColor3 = "Outline",
 		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(1, 0),
+		})
 	})
 
 	local ToggleBorder = New("UIStroke", {
-		Transparency = 0.5,
+		Transparency = 0,
+		Thickness = 2,
 		ThemeTag = {
-			Color = "ToggleSlider",
+			Color = "Outline",
 		},
 	})
 
 	local ToggleSlider = New("Frame", {
-		Size = UDim2.fromOffset(36, 18),
+		Size = UDim2.fromOffset(44, 24),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
 		Parent = ToggleFrame.Frame,
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			BackgroundColor3 = "Accent",
+			BackgroundColor3 = "Primary",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 9),
+			CornerRadius = UDim.new(1, 0),
 		}),
 		ToggleBorder,
 		ToggleCircle,
@@ -69,19 +73,24 @@ function Element:New(Idx, Config)
 		Value = not not Value
 		Toggle.Value = Value
 
-		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
-		Creator.OverrideTag(ToggleCircle, { ImageColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })
+		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Primary" or "Outline" })
+		ToggleBorder.Transparency = Toggle.Value and 1 or 0
+		Creator.OverrideTag(ToggleCircle, { BackgroundColor3 = Toggle.Value and "OnPrimary" or "Outline" })
+		
+		-- MD3 switch thumb expands slightly when active, but moving it is standard
+		local circleSize = Toggle.Value and 20 or 16
+		local circlePos = Toggle.Value and 20 or 4
+		
 		TweenService:Create(
 			ToggleCircle,
 			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-			{ Position = UDim2.new(0, Toggle.Value and 19 or 2, 0.5, 0) }
+			{ Position = UDim2.new(0, circlePos, 0.5, 0), Size = UDim2.fromOffset(circleSize, circleSize) }
 		):Play()
 		TweenService:Create(
 			ToggleSlider,
 			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
 			{ BackgroundTransparency = Toggle.Value and 0 or 1 }
 		):Play()
-		ToggleCircle.ImageTransparency = Toggle.Value and 0 or 0.5
 
 		Library:SafeCallback(Toggle.Callback, Toggle.Value)
 		Library:SafeCallback(Toggle.Changed, Toggle.Value)

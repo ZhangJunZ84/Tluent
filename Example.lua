@@ -7,13 +7,11 @@ local Window = Fluent:CreateWindow({
     SubTitle = "Something",
     SubTitlePosition = "Side", -- "Below" or "Side" (default)
     TabStyle = "Tabs", -- "Tabs" or "Icons"
-    TabIndicator = "Border", -- "Line" (default vertical indicator) or "Border" (solid accent border)
-    -- TabIndicatorThickness = 1, -- Default: 0.5
     TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
     Transparency = false,
-    Theme = "Dark",
+    Theme = "Dark", -- You can use presets like Dark, Light, Aqua, etc.
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 
@@ -182,6 +180,7 @@ do
         Description = "You can select multiple values.",
         Values = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"},
         Multi = true,
+        Search = true,
         Default = {"seven", "twelve"},
     })
 

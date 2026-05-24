@@ -26,8 +26,7 @@ return function(Config)
 		CurrentPos = 0,
 		TabWidth = 0,
 		TabStyle = Config.TabStyle or "Tabs",
-		TabIndicator = Config.TabIndicator or "Line",
-		TabIndicatorThickness = Config.TabIndicatorThickness,
+
 		Position = UDim2.fromOffset(
 			Camera.ViewportSize.X / 2 - Config.Size.X.Offset / 2,
 			Camera.ViewportSize.Y / 2 - Config.Size.Y.Offset / 2
@@ -41,21 +40,6 @@ return function(Config)
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
 	local DefaultTabWidth = Window.TabStyle == "Icons" and 36 or 120
 	Window.TabWidth = Config.TabWidth or DefaultTabWidth
-
-	local Selector = New("Frame", {
-		Size = UDim2.fromOffset(4, 0),
-		BackgroundColor3 = Color3.fromRGB(76, 194, 255),
-		Position = UDim2.fromOffset(0, 17),
-		AnchorPoint = Vector2.new(0, 0.5),
-		Visible = Config.TabIndicator ~= "Border",
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(0, 2),
-		}),
-	})
 
 	local ResizeStartFrame = New("Frame", {
 		Size = UDim2.fromOffset(20, 20),
@@ -89,15 +73,14 @@ return function(Config)
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 	}, {
-		Window.TabHolder,
-		Selector,
+		Window.TabHolder
 	})
 
 	Window.TabDisplay = New("TextLabel", {
 		RichText = true,
 		Text = "Tab",
 		TextTransparency = 0,
-		FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
 		TextSize = 28,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
@@ -114,17 +97,11 @@ return function(Config)
 		BackgroundTransparency = 1,
 	})
 
-	Window.ContainerAnim = New("CanvasGroup", {
-		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
-	})
-
 	Window.ContainerCanvas = New("Frame", {
 		Size = UDim2.new(1, -Window.TabWidth - 32, 1, -(102 + BarOffset)),
 		Position = UDim2.fromOffset(Window.TabWidth + 26, 90 + BarOffset),
 		BackgroundTransparency = 1,
 	}, {
-		Window.ContainerAnim,
 		Window.ContainerHolder
 	})
 
@@ -163,43 +140,12 @@ return function(Config)
 		Y = Window.Position.Y.Offset,
 	})
 
-	Window.SelectorPosMotor = Flipper.SingleMotor.new(17 + BarOffset)
-	Window.SelectorSizeMotor = Flipper.SingleMotor.new(0)
-	Window.ContainerBackMotor = Flipper.SingleMotor.new(0)
-	Window.ContainerPosMotor = Flipper.SingleMotor.new(94 + BarOffset)
-
 	SizeMotor:onStep(function(values)
 		Window.Root.Size = UDim2.new(0, values.X, 0, values.Y)
 	end)
 
 	PosMotor:onStep(function(values)
 		Window.Root.Position = UDim2.new(0, values.X, 0, values.Y)
-	end)
-
-	local LastValue = 0
-	local LastTime = 0
-	Window.SelectorPosMotor:onStep(function(Value)
-		Selector.Position = UDim2.new(0, 0, 0, Value + 17 + BarOffset)
-		local Now = tick()
-		local DeltaTime = Now - LastTime
-
-		if LastValue ~= nil then
-			Window.SelectorSizeMotor:setGoal(Spring((math.abs(Value - LastValue) / (DeltaTime * 60)) + 16))
-			LastValue = Value
-		end
-		LastTime = Now
-	end)
-
-	Window.SelectorSizeMotor:onStep(function(Value)
-		Selector.Size = UDim2.new(0, 4, 0, Value)
-	end)
-
-	Window.ContainerBackMotor:onStep(function(Value)
-		Window.ContainerAnim.GroupTransparency = Value
-	end)
-
-	Window.ContainerPosMotor:onStep(function(Value)
-		Window.ContainerAnim.Position = UDim2.fromOffset(0, Value)
 	end)
 
 	local OldSizeX
@@ -355,19 +301,23 @@ return function(Config)
 		Dialog.Title.Text = Config.Title
 
 		local Content = New("TextLabel", {
-			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+			FontFace = Font.new(
+				"rbxasset://fonts/families/Roboto.json",
+				Enum.FontWeight.Regular,
+				Enum.FontStyle.Normal
+			),
 			Text = Config.Content,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
 			TextSize = 14,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
-			Size = UDim2.new(1, -40, 1, 0),
-			Position = UDim2.fromOffset(20, 60),
+			Size = UDim2.new(1, -48, 1, 0),
+			Position = UDim2.fromOffset(24, 64),
 			BackgroundTransparency = 1,
 			Parent = Dialog.Root,
 			ClipsDescendants = false,
 			ThemeTag = {
-				TextColor3 = "Text",
+				TextColor3 = "SubText", -- MD3 Body uses OnSurfaceVariant (SubText)
 			},
 		})
 
@@ -415,12 +365,6 @@ return function(Config)
 	function Window:SelectTab(Tab)
 		TabModule:SelectTab(Tab)
 	end
-
-	Creator.AddSignal(Window.TabHolder:GetPropertyChangedSignal("CanvasPosition"), function()
-		LastValue = TabModule:GetCurrentTabPos() + 16
-		LastTime = 0
-		Window.SelectorPosMotor:setGoal(Instant(TabModule:GetCurrentTabPos()))
-	end)
 
 	return Window
 end

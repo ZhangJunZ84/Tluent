@@ -50,7 +50,7 @@ function Element:New(Idx, Config)
 		Parent = ColorpickerFrame.Frame,
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 4),
+			CornerRadius = UDim.new(0, 8),
 		}),
 	})
 
@@ -65,7 +65,7 @@ function Element:New(Idx, Config)
 		TileSize = UDim2.fromOffset(40, 40),
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 4),
+			CornerRadius = UDim.new(0, 8),
 		}),
 		DisplayFrameColor,
 	})
@@ -89,13 +89,13 @@ function Element:New(Idx, Config)
 		local function CreateInputLabel(Text, Pos)
 			return New("TextLabel", {
 				FontFace = Font.new(
-					"rbxasset://fonts/families/GothamSSm.json",
+					"rbxasset://fonts/families/Roboto.json",
 					Enum.FontWeight.Medium,
 					Enum.FontStyle.Normal
 				),
 				Text = Text,
 				TextColor3 = Color3.fromRGB(240, 240, 240),
-				TextSize = 13,
+				TextSize = 14,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				Size = UDim2.new(1, 0, 0, 32),
 				Position = Pos,
@@ -129,7 +129,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 4),
+				CornerRadius = UDim.new(0, 8),
 			}),
 			SatCursor,
 		})
@@ -140,7 +140,7 @@ function Element:New(Idx, Config)
 			BackgroundTransparency = Colorpicker.Transparency,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 4),
+				CornerRadius = UDim.new(0, 8),
 			}),
 		})
 
@@ -155,7 +155,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 4),
+				CornerRadius = UDim.new(0, 8),
 			}),
 			New("UIStroke", {
 				Thickness = 2,
@@ -170,7 +170,7 @@ function Element:New(Idx, Config)
 			BackgroundTransparency = 0,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 4),
+				CornerRadius = UDim.new(0, 8),
 			}),
 		})
 
@@ -185,7 +185,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 4),
+				CornerRadius = UDim.new(0, 8),
 			}),
 			New("UIStroke", {
 				Thickness = 2,

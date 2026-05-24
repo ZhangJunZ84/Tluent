@@ -6,6 +6,7 @@ local Camera = game:GetService("Workspace").CurrentCamera
 local Root = script.Parent.Parent
 local Creator = require(Root.Creator)
 local Flipper = require(Root.Packages.Flipper)
+local Icons = require(Root.Icons)
 
 local New = Creator.New
 local Components = Root.Components
@@ -37,10 +38,10 @@ function Element:New(Idx, Config)
 	Dropdown.SetDesc = DropdownFrame.SetDesc
 
 	local DropdownDisplay = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
 		Text = "Value",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 13,
+		TextSize = 14,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Size = UDim2.new(1, -30, 0, 14),
 		Position = UDim2.new(0, 8, 0.5, 0),
@@ -75,7 +76,7 @@ function Element:New(Idx, Config)
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 5),
+			CornerRadius = UDim.new(0, 8),
 		}),
 		New("UIStroke", {
 			Transparency = 0.5,
@@ -116,7 +117,7 @@ function Element:New(Idx, Config)
 	}, {
 		DropdownScrollFrame,
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 7),
+			CornerRadius = UDim.new(0, 12),
 		}),
 		New("UIStroke", {
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
@@ -155,8 +156,8 @@ function Element:New(Idx, Config)
 	if SearchEnabled then
 		local SearchIcon = New("ImageLabel", {
 			Image = "rbxassetid://10734943674",
-			Size = UDim2.fromOffset(14, 14),
-			Position = UDim2.new(0, 8, 0.5, 0),
+			Size = UDim2.fromOffset(16, 16),
+			Position = UDim2.new(0, 10, 0.5, 0),
 			AnchorPoint = Vector2.new(0, 0.5),
 			BackgroundTransparency = 1,
 			ThemeTag = {
@@ -165,15 +166,15 @@ function Element:New(Idx, Config)
 		})
 
 		SearchBox = New("TextBox", {
-			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+			FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
 			Text = "",
 			PlaceholderText = "Search...",
 			TextColor3 = Color3.fromRGB(200, 200, 200),
 			PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
-			TextSize = 13,
+			TextSize = 14,
 			TextXAlignment = Enum.TextXAlignment.Left,
-			Size = UDim2.new(1, -28, 1, 0),
-			Position = UDim2.fromOffset(28, 0),
+			Size = UDim2.new(1, -38, 1, 0),
+			Position = UDim2.fromOffset(34, 0),
 			BackgroundTransparency = 1,
 			ClearTextOnFocus = false,
 			ThemeTag = {
@@ -183,7 +184,7 @@ function Element:New(Idx, Config)
 		})
 
 		SearchFrame = New("Frame", {
-			Size = UDim2.new(1, -10, 0, 26),
+			Size = UDim2.new(1, -10, 0, 30),
 			Position = UDim2.fromOffset(5, 5),
 			BackgroundTransparency = 0.9,
 			Parent = DropdownHolderFrame,
@@ -192,14 +193,21 @@ function Element:New(Idx, Config)
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 5),
+				CornerRadius = UDim.new(0, 8),
+			}),
+			New("UIStroke", {
+				Transparency = 0.5,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				ThemeTag = {
+					Color = "InElementBorder",
+				},
 			}),
 			SearchIcon,
 			SearchBox,
 		})
 
-		DropdownScrollFrame.Size = UDim2.new(1, -5, 1, -36)
-		DropdownScrollFrame.Position = UDim2.fromOffset(5, 31)
+		DropdownScrollFrame.Size = UDim2.new(1, -5, 1, -45)
+		DropdownScrollFrame.Position = UDim2.fromOffset(5, 40)
 	end
 
 	local function RecalculateListPosition()
@@ -216,7 +224,7 @@ function Element:New(Idx, Config)
 
 	local ListSizeX = 0
 	local VisibleCount = #Dropdown.Values
-	local SearchHeightOffset = SearchEnabled and 31 or 0
+	local SearchHeightOffset = SearchEnabled and 40 or 0
 
 	local function RecalculateListSize()
 		if VisibleCount > 10 then
@@ -272,6 +280,7 @@ function Element:New(Idx, Config)
 		Dropdown.Opened = true
 		ScrollFrame.ScrollingEnabled = false
 		DropdownHolderCanvas.Visible = true
+		DropdownScrollFrame.CanvasPosition = Vector2.new(0, 0)
 		TweenService:Create(
 			DropdownHolderFrame,
 			TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -288,6 +297,7 @@ function Element:New(Idx, Config)
 		if SearchEnabled then
 			SearchBox.Text = ""
 			Dropdown.SearchFilter = ""
+			Dropdown:ApplySearch()
 		end
 	end
 
@@ -324,6 +334,10 @@ function Element:New(Idx, Config)
 	end
 
 	function Dropdown:BuildDropdownList()
+		if not Dropdown.ButtonPool then
+			Dropdown.ButtonPool = {}
+		end
+
 		Dropdown.Buttons = {}
 
 		if Dropdown.NoResultsLabel then
@@ -331,147 +345,151 @@ function Element:New(Idx, Config)
 			Dropdown.NoResultsLabel = nil
 		end
 
-		for _, Element in next, DropdownScrollFrame:GetChildren() do
-			if not Element:IsA("UIListLayout") then
-				Element:Destroy()
-			end
-		end
-
 		local Count = 0
 
 		for Idx, Value in next, Dropdown.Values do
 			local Table = {
-				Value = Value
+				Value = Value,
+				Selected = false
 			}
 
 			Count = Count + 1
+			local CurrentCount = Count
 
-			local ButtonSelector = New("Frame", {
-				Size = UDim2.fromOffset(4, 14),
-				BackgroundColor3 = Color3.fromRGB(76, 194, 255),
-				Position = UDim2.fromOffset(-1, 16),
-				AnchorPoint = Vector2.new(0, 0.5),
-				ThemeTag = {
-					BackgroundColor3 = "Accent",
-				},
-			}, {
-				New("UICorner", {
-					CornerRadius = UDim.new(0, 2),
-				}),
-			})
+			local Button, ButtonLabel, ButtonSelector
+			local Cache
 
-			local ButtonLabel = New("TextLabel", {
-				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
-				Text = Value,
-				TextColor3 = Color3.fromRGB(200, 200, 200),
-				TextSize = 13,
-				TextXAlignment = Enum.TextXAlignment.Left,
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				Size = UDim2.fromScale(1, 1),
-				Position = UDim2.fromOffset(10, 0),
-				Name = "ButtonLabel",
-				ThemeTag = {
-					TextColor3 = "Text",
-				},
-			})
-
-			local Button = New("TextButton", {
-				Size = UDim2.new(1, -5, 0, 32),
-				BackgroundTransparency = 1,
-				ZIndex = 23,
-				Text = "",
-				Parent = DropdownScrollFrame,
-				ThemeTag = {
-					BackgroundColor3 = "DropdownOption",
-				},
-			}, {
-				ButtonSelector,
-				ButtonLabel,
-				New("UICorner", {
-					CornerRadius = UDim.new(0, 6),
-				}),
-			})
-
-			local Selected
-
-			if Config.Multi then
-				Selected = Dropdown.Value[Value]
+			if CurrentCount <= #Dropdown.ButtonPool then
+				Cache = Dropdown.ButtonPool[CurrentCount]
+				Button = Cache.Button
+				ButtonLabel = Cache.Label
+				ButtonSelector = Cache.Selector
+				
+				Button.Visible = true
+				ButtonLabel.Text = Value
 			else
-				Selected = Dropdown.Value == Value
+				local CheckIcon = Icons.Image({
+					Icon = "check",
+					Size = UDim2.fromOffset(14, 14),
+					Colors = { "Accent" },
+				})
+				ButtonSelector = CheckIcon.IconFrame
+				ButtonSelector.Name = "ButtonSelector"
+				ButtonSelector.Position = UDim2.new(0, 8, 0.5, 0)
+				ButtonSelector.AnchorPoint = Vector2.new(0, 0.5)
+
+				ButtonLabel = New("TextLabel", {
+					FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+					Text = Value,
+					TextColor3 = Color3.fromRGB(200, 200, 200),
+					TextSize = 14,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					AutomaticSize = Enum.AutomaticSize.Y,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, -36, 1, 0),
+					Position = UDim2.fromOffset(30, 0),
+					Name = "ButtonLabel",
+					ThemeTag = { TextColor3 = "Text" },
+				})
+
+				Button = New("TextButton", {
+					Size = UDim2.new(1, -5, 0, 32),
+					BackgroundTransparency = 1,
+					ZIndex = 23,
+					Text = "",
+					Parent = DropdownScrollFrame,
+					ThemeTag = { BackgroundColor3 = "DropdownOption" },
+				}, {
+					ButtonSelector,
+					ButtonLabel,
+					New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+				})
+
+				local BackMotor, SetBackTransparency = Creator.SpringMotor(1, Button, "BackgroundTransparency")
+				local SelMotor, SetSelTransparency = Creator.SpringMotor(1, ButtonSelector, "ImageTransparency")
+
+				Creator.AddSignal(Button.MouseEnter, function()
+					local CurrentTable = Dropdown.ButtonPool[CurrentCount].Table
+					SetBackTransparency(CurrentTable.Selected and 0.85 or 0.89)
+				end)
+				Creator.AddSignal(Button.MouseLeave, function()
+					local CurrentTable = Dropdown.ButtonPool[CurrentCount].Table
+					SetBackTransparency(CurrentTable.Selected and 0.89 or 1)
+				end)
+				Creator.AddSignal(Button.MouseButton1Down, function()
+					SetBackTransparency(0.92)
+				end)
+				Creator.AddSignal(Button.MouseButton1Up, function()
+					local CurrentTable = Dropdown.ButtonPool[CurrentCount].Table
+					SetBackTransparency(CurrentTable.Selected and 0.85 or 0.89)
+				end)
+
+				ButtonLabel.InputBegan:Connect(function(Input)
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+						local CurrentTable = Dropdown.ButtonPool[CurrentCount].Table
+						local CurrentValue = CurrentTable.Value
+						local Try = not CurrentTable.Selected
+
+						if Dropdown:GetActiveValues() == 1 and not Try and not Config.AllowNull then
+						else
+							if Config.Multi then
+								CurrentTable.Selected = Try
+								Dropdown.Value[CurrentValue] = CurrentTable.Selected and true or nil
+							else
+								CurrentTable.Selected = Try
+								Dropdown.Value = CurrentTable.Selected and CurrentValue or nil
+
+								for _, OtherButton in next, Dropdown.Buttons do
+									OtherButton:UpdateButton()
+								end
+							end
+
+							CurrentTable:UpdateButton()
+							Dropdown:Display()
+
+							Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
+							Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
+						end
+					end
+				end)
+
+				Cache = {
+					Button = Button,
+					Label = ButtonLabel,
+					Selector = ButtonSelector,
+					SetBackTransparency = SetBackTransparency,
+					SetSelTransparency = SetSelTransparency,
+				}
+				Dropdown.ButtonPool[CurrentCount] = Cache
 			end
 
-			local BackMotor, SetBackTransparency = Creator.SpringMotor(1, Button, "BackgroundTransparency")
-			local SelMotor, SetSelTransparency = Creator.SpringMotor(1, ButtonSelector, "BackgroundTransparency")
-			local SelectorSizeMotor = Flipper.SingleMotor.new(6)
-
-			SelectorSizeMotor:onStep(function(value)
-				ButtonSelector.Size = UDim2.new(0, 4, 0, value)
-			end)
-
-			Creator.AddSignal(Button.MouseEnter, function()
-				SetBackTransparency(Selected and 0.85 or 0.89)
-			end)
-			Creator.AddSignal(Button.MouseLeave, function()
-				SetBackTransparency(Selected and 0.89 or 1)
-			end)
-			Creator.AddSignal(Button.MouseButton1Down, function()
-				SetBackTransparency(0.92)
-			end)
-			Creator.AddSignal(Button.MouseButton1Up, function()
-				SetBackTransparency(Selected and 0.85 or 0.89)
-			end)
+			Cache.Table = Table
 
 			function Table:UpdateButton()
+				local CurrentValue = Table.Value
 				if Config.Multi then
-					Selected = Dropdown.Value[Value]
-					if Selected then
-						SetBackTransparency(0.89)
-					end
+					Table.Selected = Dropdown.Value[CurrentValue]
+					Cache.SetBackTransparency(Table.Selected and 0.89 or 1)
 				else
-					Selected = Dropdown.Value == Value
-					SetBackTransparency(Selected and 0.89 or 1)
+					Table.Selected = Dropdown.Value == CurrentValue
+					Cache.SetBackTransparency(Table.Selected and 0.89 or 1)
 				end
 
-				SelectorSizeMotor:setGoal(Flipper.Spring.new(Selected and 14 or 6, { frequency = 6 }))
-				SetSelTransparency(Selected and 0 or 1)
+				Creator.OverrideTag(Cache.Label, { TextColor3 = Table.Selected and "Accent" or "Text" })
+				Cache.SetSelTransparency(Table.Selected and 0 or 1)
 			end
-
-			ButtonLabel.InputBegan:Connect(function(Input)
-				if
-					Input.UserInputType == Enum.UserInputType.MouseButton1
-					or Input.UserInputType == Enum.UserInputType.Touch
-				then
-					local Try = not Selected
-
-					if Dropdown:GetActiveValues() == 1 and not Try and not Config.AllowNull then
-					else
-						if Config.Multi then
-							Selected = Try
-							Dropdown.Value[Value] = Selected and true or nil
-						else
-							Selected = Try
-							Dropdown.Value = Selected and Value or nil
-
-							for _, OtherButton in next, Dropdown.Buttons do
-								OtherButton:UpdateButton()
-							end
-						end
-
-						Table:UpdateButton()
-						Dropdown:Display()
-
-						Library:SafeCallback(Dropdown.Callback, Dropdown.Value)
-						Library:SafeCallback(Dropdown.Changed, Dropdown.Value)
-					end
-				end
-			end)
 
 			Table:UpdateButton()
 			Dropdown:Display()
 
 			Dropdown.Buttons[Button] = Table
+		end
+
+		if Dropdown.ButtonPool then
+			for i = Count + 1, #Dropdown.ButtonPool do
+				Dropdown.ButtonPool[i].Button.Visible = false
+			end
 		end
 
 		VisibleCount = Count
@@ -496,6 +514,8 @@ function Element:New(Idx, Config)
 		local filterText = SearchEnabled and Dropdown.SearchFilter ~= "" and string.lower(Dropdown.SearchFilter) or nil
 		local Count = 0
 
+		DropdownScrollFrame.CanvasPosition = Vector2.new(0, 0)
+
 		for Button, Table in next, Dropdown.Buttons do
 			local Value = Table.Value
 			local matches = true
@@ -516,10 +536,10 @@ function Element:New(Idx, Config)
 		if Count == 0 and SearchEnabled and Dropdown.SearchFilter ~= "" then
 			if not Dropdown.NoResultsLabel then
 				Dropdown.NoResultsLabel = New("TextLabel", {
-					FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+					FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
 					Text = "No results found",
 					TextColor3 = Color3.fromRGB(200, 200, 200),
-					TextSize = 13,
+					TextSize = 14,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, -5, 0, 32),
 					ThemeTag = {

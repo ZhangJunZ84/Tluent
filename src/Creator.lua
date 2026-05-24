@@ -24,7 +24,7 @@ local Creator = {
 		TextLabel = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
 			BorderColor3 = Color3.new(0, 0, 0),
-			Font = Enum.Font.SourceSans,
+			Font = Enum.Font.Roboto,
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			BackgroundTransparency = 1,
@@ -34,7 +34,7 @@ local Creator = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
 			BorderColor3 = Color3.new(0, 0, 0),
 			AutoButtonColor = false,
-			Font = Enum.Font.SourceSans,
+			Font = Enum.Font.Roboto,
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			TextSize = 14,
@@ -43,7 +43,7 @@ local Creator = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
 			BorderColor3 = Color3.new(0, 0, 0),
 			ClearTextOnFocus = false,
-			Font = Enum.Font.SourceSans,
+			Font = Enum.Font.Roboto,
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			TextSize = 14,
@@ -66,6 +66,42 @@ local Creator = {
 		},
 	},
 }
+
+Creator.Typography = {
+	Display = { Font = Enum.Font.Roboto, Size = 36 },
+	Headline = { Font = Enum.Font.Roboto, Size = 24 },
+	Title = { Font = Enum.Font.Roboto, Size = 16, Weight = Enum.FontWeight.Medium },
+	Label = { Font = Enum.Font.Roboto, Size = 14, Weight = Enum.FontWeight.Medium },
+	Body = { Font = Enum.Font.Roboto, Size = 14 },
+}
+
+function Creator.CreateRipple(Button)
+	Creator.AddSignal(Button.MouseButton1Down, function()
+		local TweenService = game:GetService("TweenService")
+		
+		local parentCorner = Button:FindFirstChildOfClass("UICorner")
+		local cornerRadius = parentCorner and parentCorner.CornerRadius or UDim.new(0, 8)
+
+		local Overlay = Creator.New("Frame", {
+			Name = "ClickIndicator",
+			Parent = Button,
+			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 0.7,
+			ZIndex = 100,
+		})
+		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = Overlay })
+		Creator.AddThemeObject(Overlay, { BackgroundColor3 = "OnSurface" })
+
+		local Tween = TweenService:Create(Overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			BackgroundTransparency = 1
+		})
+		Tween:Play()
+		
+		Tween.Completed:Connect(function() 
+			Overlay:Destroy() 
+		end)
+	end)
+end
 
 local function ApplyCustomProps(Object, Props)
 	if Props.ThemeTag then
@@ -122,7 +158,13 @@ end
 
 function Creator.OverrideTag(Object, Properties)
 	Creator.Registry[Object].Properties = Properties
-	Creator.UpdateTheme()
+	for Property, ColorIdx in next, Properties do
+		if type(ColorIdx) == "function" then
+			ColorIdx(Creator.GetThemeProperty)
+		else
+			Object[Property] = Creator.GetThemeProperty(ColorIdx)
+		end
+	end
 end
 
 function Creator.New(Name, Properties, Children)

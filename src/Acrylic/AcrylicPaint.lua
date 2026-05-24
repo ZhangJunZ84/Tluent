@@ -25,7 +25,7 @@ return function(props)
 		}),
 
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 12),
 		}),
 
 		New("Frame", {
@@ -37,7 +37,7 @@ return function(props)
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 12),
 			}),
 		}),
 
@@ -47,7 +47,7 @@ return function(props)
 			Size = UDim2.fromScale(1, 1),
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 12),
 			}),
 
 			New("UIGradient", {
@@ -67,7 +67,7 @@ return function(props)
 			BackgroundTransparency = 1,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 12),
 			}),
 		}),
 
@@ -83,7 +83,7 @@ return function(props)
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 12),
 			}),
 		}),
 
@@ -93,7 +93,7 @@ return function(props)
 			ZIndex = 2,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 12),
 			}),
 			New("UIStroke", {
 				Transparency = 0.5,
