@@ -32,7 +32,7 @@ function Dialog:Create()
 		Parent = Dialog.Window.Root,
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 12),
 		}),
 	})
 
@@ -47,7 +47,7 @@ function Dialog:Create()
 		New("UIListLayout", {
 			Padding = UDim.new(0, 10),
 			FillDirection = Enum.FillDirection.Horizontal,
-			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 		}),
 	})
@@ -96,7 +96,7 @@ function Dialog:Create()
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 24), -- MD3 standard dialog radius
+			CornerRadius = UDim.new(0, 28), -- MD3 standard dialog radius
 		}),
 		New("UIStroke", {
 			Transparency = 0.5,
@@ -136,11 +136,17 @@ function Dialog:Create()
 
 		local Button = require(Root.Components.Button)("", NewDialog.ButtonHolder, true)
 		Button.Title.Text = Title
+		
+		-- MD3 button styling: pill shape for dialog actions
+		local btnCorner = Button.Frame:FindFirstChildOfClass("UICorner")
+		if btnCorner then btnCorner.CornerRadius = UDim.new(1, 0) end
+		local hoverCorner = Button.HoverFrame:FindFirstChildOfClass("UICorner")
+		if hoverCorner then hoverCorner.CornerRadius = UDim.new(1, 0) end
 
 		for _, Btn in next, NewDialog.ButtonHolder:GetChildren() do
 			if Btn:IsA("TextButton") then
 				Btn.Size =
-					UDim2.new(1 / NewDialog.Buttons, -(((NewDialog.Buttons - 1) * 10) / NewDialog.Buttons), 0, 32)
+					UDim2.new(1 / NewDialog.Buttons, -(((NewDialog.Buttons - 1) * 10) / NewDialog.Buttons), 0, 36)
 			end
 		end
 

@@ -37,8 +37,6 @@ function Notification:New(Config)
 		Closed = false,
 	}
 
-	NewNotification.AcrylicPaint = Acrylic.AcrylicPaint()
-
 	NewNotification.Title = New("TextLabel", {
 		Position = UDim2.new(0, 14, 0, 17),
 		Text = Config.Title,
@@ -125,11 +123,22 @@ function Notification:New(Config)
 	})
 
 	NewNotification.Root = New("Frame", {
-		BackgroundTransparency = 1,
+		BackgroundTransparency = 0,
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.fromScale(1, 0),
+		ThemeTag = {
+			BackgroundColor3 = "Dialog",
+		},
 	}, {
-		NewNotification.AcrylicPaint.Frame,
+		New("UICorner", {
+			CornerRadius = UDim.new(0, 12),
+		}),
+		New("UIStroke", {
+			Transparency = 0.5,
+			ThemeTag = {
+				Color = "DialogBorder",
+			},
+		}),
 		NewNotification.Title,
 		NewNotification.CloseButton,
 		NewNotification.LabelHolder,
@@ -151,18 +160,28 @@ function Notification:New(Config)
 		NewNotification.Root,
 	})
 
-	local ProgressBar = New("Frame", {
-		Size = UDim2.new(1, -28, 0, 3),
-		Position = UDim2.new(0, 14, 1, -8),
+	local ProgressTrack = New("Frame", {
+		Size = UDim2.new(1, -28, 0, 4),
+		Position = UDim2.new(0, 14, 1, -12),
 		BorderSizePixel = 0,
+		BackgroundTransparency = 0.8,
 		Parent = NewNotification.Root,
 		ThemeTag = {
 			BackgroundColor3 = "Primary",
 		},
 	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		}),
+		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+	})
+
+	local ProgressBar = New("Frame", {
+		Size = UDim2.new(1, 0, 1, 0),
+		BorderSizePixel = 0,
+		Parent = ProgressTrack,
+		ThemeTag = {
+			BackgroundColor3 = "Primary",
+		},
+	}, {
+		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
 	})
 
 	local RootMotor = Flipper.GroupMotor.new({
@@ -197,9 +216,6 @@ function Notification:New(Config)
 					Offset = Spring(60, { frequency = 5 }),
 				})
 				task.wait(0.4)
-				if require(Root).UseAcrylic then
-					NewNotification.AcrylicPaint.Model:Destroy()
-				end
 				NewNotification.Holder:Destroy()
 			end)
 		end
@@ -207,9 +223,8 @@ function Notification:New(Config)
 
 	NewNotification:Open()
 	if Config.Duration then
-		ProgressBar.Size = UDim2.new(1, -28, 0, 3)
 		local Tween = TweenService:Create(ProgressBar, TweenInfo.new(Config.Duration, Enum.EasingStyle.Linear), {
-			Size = UDim2.new(0, 0, 0, 3),
+			Size = UDim2.new(0, 0, 1, 0),
 		})
 		Tween:Play()
 
@@ -217,7 +232,7 @@ function Notification:New(Config)
 			NewNotification:Close()
 		end)
 	else
-		ProgressBar.Visible = false
+		ProgressTrack.Visible = false
 	end
 	return NewNotification
 end
