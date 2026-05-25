@@ -1,6 +1,7 @@
 local Root = script.Parent
 local Themes = require(Root.Themes)
 local Flipper = require(Root.Packages.Flipper)
+local TweenService = game:GetService("TweenService")
 
 local Creator = {
 	Registry = {},
@@ -77,8 +78,6 @@ Creator.Typography = {
 
 function Creator.CreateRipple(Button)
 	Creator.AddSignal(Button.MouseButton1Down, function()
-		local TweenService = game:GetService("TweenService")
-		
 		local parentCorner = Button:FindFirstChildOfClass("UICorner")
 		local cornerRadius = parentCorner and parentCorner.CornerRadius or UDim.new(0, 8)
 
@@ -117,6 +116,10 @@ function Creator.Disconnect()
 	for Idx = #Creator.Signals, 1, -1 do
 		local Connection = table.remove(Creator.Signals, Idx)
 		Connection:Disconnect()
+	end
+
+	for Idx = #Creator.TransparencyMotors, 1, -1 do
+		table.remove(Creator.TransparencyMotors, Idx)
 	end
 end
 
@@ -201,6 +204,14 @@ function Creator.SpringMotor(Initial, Instance, Prop, IgnoreDialogCheck, ResetOn
 
 	if ResetOnThemeChange then
 		table.insert(Creator.TransparencyMotors, Motor)
+		Instance.Destroying:Connect(function()
+			for i = #Creator.TransparencyMotors, 1, -1 do
+				if Creator.TransparencyMotors[i] == Motor then
+					table.remove(Creator.TransparencyMotors, i)
+					break
+				end
+			end
+		end)
 	end
 
 	local function SetValue(Value, Ignore)

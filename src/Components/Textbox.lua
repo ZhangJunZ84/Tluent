@@ -66,7 +66,9 @@ return function(Parent, Acrylic)
 		Textbox.Container,
 	})
 
+	local updatePending = false
 	local function Update()
+		updatePending = false
 		local PADDING = 2
 		local Reveal = Textbox.Container.AbsoluteSize.X
 
@@ -93,10 +95,17 @@ return function(Parent, Acrylic)
 		end
 	end
 
+	local function ScheduleUpdate()
+		if not updatePending then
+			updatePending = true
+			task.defer(Update)
+		end
+	end
+
 	task.spawn(Update)
 
-	Creator.AddSignal(Textbox.Input:GetPropertyChangedSignal("Text"), Update)
-	Creator.AddSignal(Textbox.Input:GetPropertyChangedSignal("CursorPosition"), Update)
+	Creator.AddSignal(Textbox.Input:GetPropertyChangedSignal("Text"), ScheduleUpdate)
+	Creator.AddSignal(Textbox.Input:GetPropertyChangedSignal("CursorPosition"), ScheduleUpdate)
 
 	Creator.AddSignal(Textbox.Input.Focused, function()
 		Update()

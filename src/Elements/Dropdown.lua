@@ -346,6 +346,7 @@ function Element:New(Idx, Config)
 		end
 
 		local Count = 0
+		local MaxLabelWidth = 0
 
 		for Idx, Value in next, Dropdown.Values do
 			local Table = {
@@ -466,6 +467,10 @@ function Element:New(Idx, Config)
 
 			Cache.Table = Table
 
+			if ButtonLabel.TextBounds.X > MaxLabelWidth then
+				MaxLabelWidth = ButtonLabel.TextBounds.X
+			end
+
 			function Table:UpdateButton()
 				local CurrentValue = Table.Value
 				if Config.Multi then
@@ -495,15 +500,7 @@ function Element:New(Idx, Config)
 		VisibleCount = Count
 
 		if Count > 0 then
-			ListSizeX = 0
-			for Button, Table in next, Dropdown.Buttons do
-				if Button.ButtonLabel then
-					if Button.ButtonLabel.TextBounds.X > ListSizeX then
-						ListSizeX = Button.ButtonLabel.TextBounds.X
-					end
-				end
-			end
-			ListSizeX = ListSizeX + 30
+			ListSizeX = MaxLabelWidth + 30
 		end
 
 		RecalculateCanvasSize()
