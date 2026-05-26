@@ -1,6 +1,7 @@
 local Creator = require(script.Parent.Parent.Creator)
 local createAcrylic = require(script.Parent.CreateAcrylic)
 local viewportPointToWorld, getOffset = unpack(require(script.Parent.Utils))
+local RunService = game:GetService("RunService")
 
 local BlurFolder = Instance.new("Folder", game:GetService("Workspace").CurrentCamera)
 
@@ -49,13 +50,20 @@ local function createAcrylicBlur(distance)
 		model.Mesh.Scale = Vector3.new(width, height, 0)
 	end
 
+	local renderPending = false
 	local function onChange(rbx)
 		local offset = getOffset()
 		local size = rbx.AbsoluteSize - Vector2.new(offset, offset)
 		local position = rbx.AbsolutePosition + Vector2.new(offset / 2, offset / 2)
 
 		updatePositions(size, position)
-		task.spawn(render)
+		if not renderPending then
+			renderPending = true
+			task.defer(function()
+				renderPending = false
+				render()
+			end)
+		end
 	end
 
 	local function renderOnChange()
@@ -64,9 +72,23 @@ local function createAcrylicBlur(distance)
 			return
 		end
 
-		table.insert(cleanups, camera:GetPropertyChangedSignal("CFrame"):Connect(render))
-		table.insert(cleanups, camera:GetPropertyChangedSignal("ViewportSize"):Connect(render))
-		table.insert(cleanups, camera:GetPropertyChangedSignal("FieldOfView"):Connect(render))
+		local cameraDirty = false
+		local function markCameraDirty()
+			cameraDirty = true
+		end
+
+		table.insert(cleanups, camera:GetPropertyChangedSignal("CFrame"):Connect(markCameraDirty))
+		table.insert(cleanups, camera:GetPropertyChangedSignal("ViewportSize"):Connect(markCameraDirty))
+		table.insert(cleanups, camera:GetPropertyChangedSignal("FieldOfView"):Connect(markCameraDirty))
+
+		local renderStepConn = RunService.RenderStepped:Connect(function()
+			if cameraDirty then
+				cameraDirty = false
+				render()
+			end
+		end)
+		table.insert(cleanups, renderStepConn)
+
 		task.spawn(render)
 	end
 

@@ -19,27 +19,26 @@ local IconModule = {
 	New = nil,
 	IconThemeTag = nil,
 
-	Icons = {
-		lucide = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/lucide/dist/Icons.lua")
-		)(),
-		solar = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/solar/dist/Icons.lua")
-		)(),
-		craft = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/craft/dist/Icons.lua")
-		)(),
-		geist = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/geist/dist/Icons.lua")
-		)(),
-		sfsymbols = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/sfsymbols/dist/Icons.lua")
-		)(),
-		gravity = loadstring(
-			Get("https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/gravity/dist/Icons.lua")
-		)(),
+	IconURLs = {
+		lucide = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/lucide/dist/Icons.lua",
+		solar = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/solar/dist/Icons.lua",
+		craft = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/craft/dist/Icons.lua",
+		geist = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/geist/dist/Icons.lua",
+		sfsymbols = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/sfsymbols/dist/Icons.lua",
+		gravity = "https://raw.githubusercontent.com/Footagesus/Icons/refs/heads/main/gravity/dist/Icons.lua",
 	},
+	Icons = {},
 }
+
+function IconModule.GetIconPack(packName)
+	if not IconModule.Icons[packName] then
+		local url = IconModule.IconURLs[packName]
+		if url then
+			IconModule.Icons[packName] = loadstring(Get(url))()
+		end
+	end
+	return IconModule.Icons[packName]
+end
 
 local function parseIconString(iconString)
 	if type(iconString) == "string" then
@@ -139,7 +138,7 @@ function IconModule.Icon(Icon, Type, DefaultFormat)
 	local targetType = iconType or Type or IconModule.IconsType
 	local targetName = iconName
 
-	local iconSet = IconModule.Icons[targetType]
+	local iconSet = IconModule.GetIconPack(targetType)
 
 	if iconSet and iconSet.Icons and iconSet.Icons[targetName] then
 		return {

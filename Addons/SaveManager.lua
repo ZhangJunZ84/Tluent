@@ -6,6 +6,7 @@ local SaveManager = {} do
 	SaveManager.AutoSave = true
 	SaveManager.AutoSaveConfigName = "__autosave"
 	SaveManager._loading = false
+	SaveManager._loadPending = false
 	SaveManager._initialized = false
 	SaveManager._hookedOptions = {}
 	SaveManager._autoSaveTimer = nil
@@ -223,50 +224,57 @@ local SaveManager = {} do
 	end
 
 	function SaveManager:AutoLoad()
-		if self._initialized then
+		if self._initialized or self._loadPending then
 			return
 		end
 
-		local options = self:GetOptions()
+		self._loadPending = true
 
-		-- If autosave is disabled, don't load anything — start fresh
-		if options.autosave == false then
-			self.AutoSave = false
-			self._initialized = true
-			return
-		end
+		-- Defer loading so the UI renders first
+		task.defer(function()
+			self._loadPending = false
 
-		-- Try autoload first
-		if options.autoload then
-			local name = options.autoload
-			local configFile = self.Folder .. "/settings/" .. name .. ".json"
-			if isfile(configFile) then
-				local success = self:Load(name)
-				if success then
-					self._initialized = true
-					self.Library:Notify({
-						Title = "Interface",
-						Content = "Config loader",
-						SubContent = string.format("Auto loaded config %q", name),
-						Duration = 7
-					})
-					return
+			local options = self:GetOptions()
+
+			-- If autosave is disabled, don't load anything — start fresh
+			if options.autosave == false then
+				self.AutoSave = false
+				self._initialized = true
+				return
+			end
+
+			-- Try autoload first
+			if options.autoload then
+				local name = options.autoload
+				local configFile = self.Folder .. "/settings/" .. name .. ".json"
+				if isfile(configFile) then
+					local success = self:Load(name)
+					if success then
+						self._initialized = true
+						self.Library:Notify({
+							Title = "Interface",
+							Content = "Config loader",
+							SubContent = string.format("Auto loaded config %q", name),
+							Duration = 7
+						})
+						return
+					end
 				end
 			end
-		end
 
-		-- Fallback to autosave
-		local success = self:Load(self.AutoSaveConfigName)
-		if success and self.Library then
-			self.Library:Notify({
-				Title = "Interface",
-				Content = "Config loader",
-				SubContent = "Auto loaded last session",
-				Duration = 7
-			})
-		end
+			-- Fallback to autosave
+			local success = self:Load(self.AutoSaveConfigName)
+			if success and self.Library then
+				self.Library:Notify({
+					Title = "Interface",
+					Content = "Config loader",
+					SubContent = "Auto loaded last session",
+					Duration = 7
+				})
+			end
 
-		self._initialized = true
+			self._initialized = true
+		end)
 	end
 
 	function SaveManager:DoAutoSave()
@@ -303,7 +311,9 @@ local SaveManager = {} do
 			if originalSetValue then
 				option.SetValue = function(self_opt, ...)
 					originalSetValue(self_opt, ...)
-					pcall(function() SaveManager:DoAutoSave() end)
+					if not SaveManager._loading then
+						pcall(function() SaveManager:DoAutoSave() end)
+					end
 				end
 			end
 
@@ -311,7 +321,9 @@ local SaveManager = {} do
 			if originalCallback then
 				option.Callback = function(self_opt, ...)
 					originalCallback(self_opt, ...)
-					pcall(function() SaveManager:DoAutoSave() end)
+					if not SaveManager._loading then
+						pcall(function() SaveManager:DoAutoSave() end)
+					end
 				end
 			end
 
@@ -319,7 +331,9 @@ local SaveManager = {} do
 			if originalChanged then
 				option.Changed = function(self_opt, ...)
 					originalChanged(self_opt, ...)
-					pcall(function() SaveManager:DoAutoSave() end)
+					if not SaveManager._loading then
+						pcall(function() SaveManager:DoAutoSave() end)
+					end
 				end
 			end
 

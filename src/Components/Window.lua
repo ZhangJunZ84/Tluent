@@ -190,9 +190,13 @@ return function(Config)
 				)
 			end
 
-			Input.Changed:Connect(function()
+			local DragConnection
+			DragConnection = Input.Changed:Connect(function()
 				if Input.UserInputState == Enum.UserInputState.End then
 					Dragging = false
+					if DragConnection then
+						DragConnection:Disconnect()
+					end
 				end
 			end)
 		end
