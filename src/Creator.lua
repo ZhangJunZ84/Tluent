@@ -146,6 +146,16 @@ function Creator.UpdateTheme()
 	end
 end
 
+local function ApplyThemeToObject(Object, Properties)
+	for Property, ColorIdx in next, Properties do
+		if type(ColorIdx) == "function" then
+			ColorIdx(Creator.GetThemeProperty)
+		else
+			Object[Property] = Creator.GetThemeProperty(ColorIdx)
+		end
+	end
+end
+
 function Creator.AddThemeObject(Object, Properties)
 	local Idx = #Creator.Registry + 1
 	local Data = {
@@ -155,7 +165,7 @@ function Creator.AddThemeObject(Object, Properties)
 	}
 
 	Creator.Registry[Object] = Data
-	Creator.UpdateTheme()
+	ApplyThemeToObject(Object, Properties)
 	return Object
 end
 

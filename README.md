@@ -19,11 +19,12 @@ Original: https://github.com/dawid-scripts/Fluent
 - [x] Tab Badges
 - [x] Slider Input
 - [x] Tab Active Style
+- [x] Style Overhaul
+- [x] Optimizations
 
 ### To-do
 - [ ] Theme Creator
 - [ ] Sub-tabs
-- [ ] Style Overhaul
 
 ## How to run locally
 1 - Clone the repo
