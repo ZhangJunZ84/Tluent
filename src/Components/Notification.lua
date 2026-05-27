@@ -1,6 +1,7 @@
 local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
+local Icons = require(Root.Icons)
 local Acrylic = require(Root.Acrylic)
 local TweenService = game:GetService("TweenService")
 
@@ -110,16 +111,16 @@ function Notification:New(Config)
 		AnchorPoint = Vector2.new(1, 0),
 		BackgroundTransparency = 1,
 	}, {
-		New("ImageLabel", {
-			Image = require(script.Parent.Assets).Close,
-			Size = UDim2.fromOffset(16, 16),
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 1,
-			ThemeTag = {
-				ImageColor3 = "Text",
-			},
-		}),
+		(function()
+			local CloseIcon = Icons.Image({
+				Icon = "lucide:x",
+				Size = UDim2.fromOffset(16, 16),
+				Colors = { "Text" },
+			})
+			CloseIcon.IconFrame.Position = UDim2.fromScale(0.5, 0.5)
+			CloseIcon.IconFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+			return CloseIcon.IconFrame
+		end)(),
 	})
 
 	NewNotification.Root = New("Frame", {

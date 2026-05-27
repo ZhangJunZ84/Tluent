@@ -7,7 +7,6 @@ local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local Acrylic = require(Root.Acrylic)
-local Assets = require(script.Parent.Assets)
 local Components = script.Parent
 
 local Spring = Flipper.Spring.new
@@ -152,7 +151,7 @@ return function(Config)
 	local OldSizeY
 	Window.Maximize = function(Value, NoPos, Instant)
 		Window.Maximized = Value
-		Window.TitleBar.MaxButton.Frame.Icon.Image = Value and Assets.Restore or Assets.Max
+		Window.TitleBar.MaxButton.SetIcon(Value and "lucide:copy" or "lucide:square")
 
 		if Value then
 			OldSizeX = Window.Size.X.Offset

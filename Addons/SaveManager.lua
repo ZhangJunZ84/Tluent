@@ -351,6 +351,7 @@ local SaveManager = {} do
 
 		section:AddButton({
             Title = "Create config",
+			Icon = "plus",
             Callback = function()
                 local name = SaveManager.Options.SaveManager_ConfigName.Value
 
@@ -385,7 +386,7 @@ local SaveManager = {} do
             end
         })
 
-        section:AddButton({Title = "Load config", Callback = function()
+        section:AddButton({Title = "Load config", Icon = "download", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 			if not name or name:gsub(" ", "") == "" then
 				return self.Library:Notify({
@@ -416,7 +417,7 @@ local SaveManager = {} do
 			})
 		end})
 
-		section:AddButton({Title = "Overwrite config", Callback = function()
+		section:AddButton({Title = "Overwrite config", Icon = "upload", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 			if not name or name:gsub(" ", "") == "" then
 				return self.Library:Notify({
@@ -445,12 +446,12 @@ local SaveManager = {} do
 			})
 		end})
 
-		section:AddButton({Title = "Refresh list", Callback = function()
+		section:AddButton({Title = "Refresh list", Icon = "rotate-cw", Callback = function()
 			SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
 		end})
 
-		section:AddButton({Title = "Delete config", Callback = function()
+		section:AddButton({Title = "Delete config", Icon = "gravity:trash-bin", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 			if not name or name:gsub(" ", "") == "" then
 				return self.Library:Notify({
@@ -493,7 +494,7 @@ local SaveManager = {} do
 		end})
 
 		local AutoloadButton
-		AutoloadButton = section:AddButton({Title = "Set as autoload", Description = "Current autoload config: none", Callback = function()
+		AutoloadButton = section:AddButton({Title = "Set as autoload", Description = "Current autoload config: none", Icon = "star", Callback = function()
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
 			if not name or name:gsub(" ", "") == "" then
 				return self.Library:Notify({
@@ -521,7 +522,7 @@ local SaveManager = {} do
 			end
 		end
 
-		section:AddButton({Title = "Clear autoload", Callback = function()
+		section:AddButton({Title = "Clear autoload", Icon = "eraser", Callback = function()
 			local options = self:GetOptions()
 			if options.autoload then
 				self:SetOption("autoload", nil)

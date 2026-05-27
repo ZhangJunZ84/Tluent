@@ -92,6 +92,11 @@ do
     Tabs.Main:AddDivider({ Width = 10000 }) 
 
     Tabs.Main:AddButton({
+        Title = "Discord",
+        Icon = "geist:logo-discord"
+    })
+
+    Tabs.Main:AddButton({
         Title = "Notify",
         Callback = function()
             Fluent:Notify({

@@ -1,5 +1,4 @@
 local Root = script.Parent.Parent
-local Assets = require(script.Parent.Assets)
 local Creator = require(Root.Creator)
 local Icons = require(Root.Icons)
 local Flipper = require(Root.Packages.Flipper)
@@ -68,10 +67,42 @@ return function(Config)
 		},
 	})
 
-	local function BarButton(Icon, Pos, Parent, Callback, IsClose)
+	local function SetIconFrame(IconFrame, Icon)
+		local IconLabel = Icons.Icon2(Icon)
+		if IconLabel then
+			local isrbxassetid = typeof(IconLabel) == "string" and string.find(IconLabel, "rbxassetid://")
+			if isrbxassetid then
+				IconFrame.Image = IconLabel
+				IconFrame.ImageRectSize = Vector2.new(0, 0)
+				IconFrame.ImageRectOffset = Vector2.new(0, 0)
+			else
+				IconFrame.Image = IconLabel[1] or ""
+				if IconLabel[2] then
+					IconFrame.ImageRectSize = IconLabel[2].ImageRectSize
+					IconFrame.ImageRectOffset = IconLabel[2].ImageRectPosition
+				end
+			end
+		end
+	end
+
+	local function BarButton(Icon, Pos, Parent, Callback, IsClose, IconSize)
 		local Button = {
 			Callback = Callback or function() end,
 		}
+
+		local IconObject = Icons.Image({
+			Icon = Icon,
+			Size = UDim2.fromOffset(IconSize or 18, IconSize or 18),
+			Colors = { "Text" },
+		})
+		local IconFrame = IconObject.IconFrame
+		IconFrame.Position = UDim2.fromScale(0.5, 0.5)
+		IconFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+		IconFrame.Name = "Icon"
+
+		Button.SetIcon = function(NewIcon)
+			SetIconFrame(IconFrame, NewIcon)
+		end
 
 		Button.Frame = New("TextButton", {
 			Size = UDim2.new(0, 36, 1, -12),
@@ -87,17 +118,7 @@ return function(Config)
 			New("UICorner", {
 				CornerRadius = UDim.new(1, 0), -- MD3 circular hover states
 			}),
-			New("ImageLabel", {
-				Image = Icon,
-				Size = UDim2.fromOffset(18, 18),
-				Position = UDim2.fromScale(0.5, 0.5),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				BackgroundTransparency = 1,
-				Name = "Icon",
-				ThemeTag = {
-					ImageColor3 = "Text",
-				},
-			}),
+			IconFrame,
 		})
 
 		local Motor, SetTransparency = Creator.SpringMotor(1, Button.Frame, "BackgroundTransparency")
@@ -185,7 +206,7 @@ return function(Config)
 		})
 	})
 
-	TitleBar.CloseButton = BarButton(Assets.Close, UDim2.new(1, -4, 0, 4), TitleBar.Frame, function()
+	TitleBar.CloseButton = BarButton("lucide:x", UDim2.new(1, -4, 0, 4), TitleBar.Frame, function()
 		Library.Window:Dialog({
 			Title = "Close",
 			Content = "Are you sure you want to unload the interface?",
@@ -202,10 +223,10 @@ return function(Config)
 			},
 		})
 	end, true)
-	TitleBar.MaxButton = BarButton(Assets.Max, UDim2.new(1, -40, 0, 4), TitleBar.Frame, function()
+	TitleBar.MaxButton = BarButton("lucide:square", UDim2.new(1, -40, 0, 4), TitleBar.Frame, function()
 		Config.Window.Maximize(not Config.Window.Maximized)
-	end)
-	TitleBar.MinButton = BarButton(Assets.Min, UDim2.new(1, -80, 0, 4), TitleBar.Frame, function()
+	end, false, 14)
+	TitleBar.MinButton = BarButton("lucide:minus", UDim2.new(1, -80, 0, 4), TitleBar.Frame, function()
 		Library.Window:Minimize()
 	end)
 
