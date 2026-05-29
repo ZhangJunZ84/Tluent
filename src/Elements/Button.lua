@@ -16,7 +16,8 @@ function Element:New(Config)
 
 	local ButtonFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, true)
 
-	local IconValue = Config.Icon ~= false and (Config.Icon or "mouse-pointer-click") or nil
+	local DefaultIcon = Config.Title:lower():find("refresh") and "refresh-cw" or "mouse-pointer-click"
+	local IconValue = Config.Icon ~= false and (Config.Icon or DefaultIcon) or nil
 
 	if IconValue then
 		local IconObject = Icons.Image({
