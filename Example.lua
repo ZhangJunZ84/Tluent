@@ -12,7 +12,8 @@ local Window = Fluent:CreateWindow({
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
     Transparency = false,
     Theme = "Dark", -- You can use presets like Dark, Light, Aqua, etc.
-    MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
+    MinimizeKey = Enum.KeyCode.LeftControl, -- Used when theres no MinimizeKeybind
+    MinimizeButton = true, -- Creates a draggable minimize button on screen
 })
 
 -- Tluent provides multi-pack icon support! You can use Lucide, Solar, Craft, Geist, SF Symbols, Gravity, or raw Roblox assets.

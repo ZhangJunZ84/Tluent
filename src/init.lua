@@ -140,7 +140,9 @@ function Library:CreateWindow(Config)
 		SubTitlePosition = Config.SubTitlePosition,
 		TabWidth = Config.TabWidth,
 		TabStyle = Config.TabStyle,
-
+		MinimizeButton = Config.MinimizeButton or false,
+		MinimizeButtonImage = Config.MinimizeButtonImage,
+		MinimizeButtonSize = Config.MinimizeButtonSize,
 	})
 
 	Library.Window = Window
@@ -162,6 +164,9 @@ function Library:Destroy()
 		Library.Unloaded = true
 		if Library.UseAcrylic then
 			Library.Window.AcrylicPaint.Model:Destroy()
+		end
+		if Library.Window.MinimizeGui then
+			Library.Window.MinimizeGui:Destroy()
 		end
 		Creator.Disconnect()
 		Library.GUI:Destroy()

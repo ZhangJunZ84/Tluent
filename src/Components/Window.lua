@@ -298,6 +298,210 @@ return function(Config)
 			Window.AcrylicPaint.Model:Destroy()
 		end
 		Window.Root:Destroy()
+		if Window.MinimizeGui then
+			Window.MinimizeGui:Destroy()
+		end
+	end
+
+	----------------------------------------------------------------
+	-- MINIMIZE BUTTON
+	----------------------------------------------------------------
+	if Config.MinimizeButton then
+		local RunService = game:GetService("RunService")
+		local LocalPlayer = game:GetService("Players").LocalPlayer
+
+		local COREGUI = nil
+		if not RunService:IsStudio() then
+			local ok, cg = pcall(game.GetService, game, "CoreGui")
+			if ok and cg then
+				COREGUI = cg
+			end
+		end
+
+		local guiParent = COREGUI or LocalPlayer:WaitForChild("PlayerGui")
+
+		local MINIMIZE_GUI_NAME = "zM_GUI"
+		local MINIMIZE_BUTTON_NAME = "zM_BTN"
+
+		local MinButtonImage = Config.MinimizeButtonImage or "rbxassetid://72031513619068"
+		local MinButtonSize = Config.MinimizeButtonSize or 50
+
+		-- Create or reuse the ScreenGui
+		local screenGui = guiParent:FindFirstChild(MINIMIZE_GUI_NAME)
+		if not screenGui then
+			screenGui = Instance.new("ScreenGui")
+			screenGui.Name = MINIMIZE_GUI_NAME
+			screenGui.ResetOnSpawn = false
+			screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+			screenGui.DisplayOrder = 999
+			screenGui.Parent = guiParent
+		elseif screenGui.Parent ~= guiParent then
+			screenGui.Parent = guiParent
+		end
+
+		-- Create or reuse the button
+		local frame = screenGui:FindFirstChild(MINIMIZE_BUTTON_NAME)
+		if not frame then
+			frame = Instance.new("ImageButton")
+			frame.Name = MINIMIZE_BUTTON_NAME
+			frame.Size = UDim2.new(0, MinButtonSize, 0, MinButtonSize)
+			frame.Image = MinButtonImage
+			frame.ScaleType = Enum.ScaleType.Stretch
+			frame.BackgroundTransparency = 1
+			frame.Parent = screenGui
+
+			local uiCorner = Instance.new("UICorner")
+			uiCorner.CornerRadius = UDim.new(0, 8)
+			uiCorner.Parent = frame
+
+			local uiStroke = Instance.new("UIStroke")
+			uiStroke.Thickness = 2.5
+			uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			uiStroke.Parent = frame
+		end
+
+		-- Position persistence
+		local framePosition = UDim2.new(0, 100, 0, 100)
+		if getgenv and getgenv().MFP then
+			framePosition = getgenv().MFP
+		end
+		frame.Position = framePosition
+
+		if getgenv then
+			getgenv().MG = screenGui
+		end
+
+		Window.MinimizeGui = screenGui
+
+		-- Theme-aware border colors
+		local cachedStroke = frame:FindFirstChildOfClass("UIStroke")
+		local function getAccentColor()
+			return Creator.GetThemeProperty("Accent")
+		end
+
+		local function brighten(color, factor)
+			local r = math.clamp(color.R + factor, 0, 1)
+			local g = math.clamp(color.G + factor, 0, 1)
+			local b = math.clamp(color.B + factor, 0, 1)
+			return Color3.new(r, g, b)
+		end
+
+		local function setBorderColor(color)
+			if cachedStroke then
+				cachedStroke.Color = color
+			end
+		end
+
+		-- Set initial accent color
+		setBorderColor(getAccentColor())
+
+		-- Register the stroke with the theme system so it updates on theme change
+		Creator.AddThemeObject(cachedStroke, {
+			Color = function(GetTheme)
+				-- Only update if not hovering/dragging (base state)
+				if not Window._minBtnHovering and not Window._minBtnDragging then
+					cachedStroke.Color = GetTheme("Accent")
+				end
+			end,
+		})
+
+		-- Drag state
+		local dragging = false
+		local isHovering = false
+		local dragStart = nil
+		local startPos = nil
+		local totalDragDistance = 0
+		local DRAG_THRESHOLD = 5
+		local LERP_SPEED = 0.5
+		local targetPosition = frame.Position
+
+		Window._minBtnHovering = false
+		Window._minBtnDragging = false
+
+		Creator.AddSignal(frame.MouseEnter, function()
+			isHovering = true
+			Window._minBtnHovering = true
+			setBorderColor(brighten(getAccentColor(), 0.2))
+		end)
+
+		Creator.AddSignal(frame.MouseLeave, function()
+			isHovering = false
+			Window._minBtnHovering = false
+			if not dragging then
+				setBorderColor(getAccentColor())
+			end
+		end)
+
+		Creator.AddSignal(frame.InputBegan, function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				Window._minBtnDragging = true
+				dragStart = Vector2.new(input.Position.X, input.Position.Y)
+				startPos = frame.Position
+				totalDragDistance = 0
+				setBorderColor(brighten(getAccentColor(), 0.35))
+			end
+		end)
+
+		Creator.AddSignal(UserInputService.InputChanged, function(input)
+			if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				local currentPos = Vector2.new(input.Position.X, input.Position.Y)
+				local delta = currentPos - dragStart
+				totalDragDistance = delta.Magnitude
+
+				targetPosition = UDim2.new(
+					startPos.X.Scale,
+					startPos.X.Offset + delta.X,
+					startPos.Y.Scale,
+					startPos.Y.Offset + delta.Y
+				)
+			end
+		end)
+
+		Creator.AddSignal(UserInputService.InputEnded, function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				if dragging then
+					dragging = false
+					Window._minBtnDragging = false
+					if totalDragDistance < DRAG_THRESHOLD then
+						Window:Minimize()
+					end
+
+					-- Clamp to viewport so the button can't be lost off-screen
+					local vpSize = Camera.ViewportSize
+					local clampedX = math.clamp(targetPosition.X.Offset, 0, vpSize.X - MinButtonSize)
+					local clampedY = math.clamp(targetPosition.Y.Offset, 0, vpSize.Y - MinButtonSize)
+					framePosition = UDim2.new(0, clampedX, 0, clampedY)
+
+					if getgenv then
+						getgenv().MFP = framePosition
+					end
+					frame.Position = framePosition
+					setBorderColor(isHovering and brighten(getAccentColor(), 0.2) or getAccentColor())
+				end
+			end
+		end)
+
+		Creator.AddSignal(RunService.RenderStepped, function()
+			if dragging then
+				local currentPos = frame.Position
+				local newX = currentPos.X.Offset + (targetPosition.X.Offset - currentPos.X.Offset) * LERP_SPEED
+				local newY = currentPos.Y.Offset + (targetPosition.Y.Offset - currentPos.Y.Offset) * LERP_SPEED
+
+				frame.Position = UDim2.new(
+					targetPosition.X.Scale,
+					newX,
+					targetPosition.Y.Scale,
+					newY
+				)
+			end
+		end)
+
+		Creator.AddSignal(frame.AncestryChanged, function()
+			if not frame:IsDescendantOf(game) then
+				Window.MinimizeGui = nil
+			end
+		end)
 	end
 
 	local DialogModule = require(Components.Dialog):Init(Window)
