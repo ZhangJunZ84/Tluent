@@ -53,6 +53,12 @@ local InterfaceManager = {} do
                 end
             end
         end
+
+        local BLOCKED_BINDS = { F13 = true, F14 = true, F15 = true }
+        if BLOCKED_BINDS[InterfaceManager.Settings.MenuKeybind] then
+            InterfaceManager.Settings.MenuKeybind = "LeftControl"
+            InterfaceManager:SaveSettings()
+        end
     end
 
     function InterfaceManager:BuildInterfaceSection(tab)

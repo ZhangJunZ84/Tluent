@@ -6,6 +6,12 @@ local Creator = require(Root.Creator)
 local New = Creator.New
 local Components = Root.Components
 
+local BLOCKED_KEYS = {
+	[Enum.KeyCode.F13] = true,
+	[Enum.KeyCode.F14] = true,
+	[Enum.KeyCode.F15] = true,
+}
+
 local Element = {}
 Element.__index = Element
 Element.__type = "Keybind"
@@ -145,6 +151,7 @@ function Element:New(Idx, Config)
 				local Key
 
 				if Input.UserInputType == Enum.UserInputType.Keyboard then
+					if BLOCKED_KEYS[Input.KeyCode] then return end
 					Key = Input.KeyCode.Name
 				elseif Input.UserInputType == Enum.UserInputType.MouseButton1 then
 					Key = "MouseLeft"
