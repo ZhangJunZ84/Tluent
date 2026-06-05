@@ -32,7 +32,7 @@ function Dialog:Create()
 		Parent = Dialog.Window.Root,
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 12),
+			CornerRadius = UDim.new(0, 8),
 		}),
 	})
 
@@ -62,13 +62,13 @@ function Dialog:Create()
 
 	NewDialog.Title = New("TextLabel", {
 		FontFace = Font.new(
-			"rbxasset://fonts/families/Roboto.json",
-			Enum.FontWeight.SemiBold,
+			"rbxassetid://12187372629",
+			Enum.FontWeight.Bold,
 			Enum.FontStyle.Normal
 		),
 		Text = "Dialog",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 24, -- MD3 Headline size
+		TextSize = 22,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Size = UDim2.new(1, 0, 0, 24),
 		Position = UDim2.fromOffset(24, 24),
@@ -96,7 +96,7 @@ function Dialog:Create()
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 28), -- MD3 standard dialog radius
+			CornerRadius = UDim.new(0, 8),
 		}),
 		New("UIStroke", {
 			Transparency = 0.5,
@@ -136,12 +136,6 @@ function Dialog:Create()
 
 		local Button = require(Root.Components.Button)("", NewDialog.ButtonHolder, true)
 		Button.Title.Text = Title
-		
-		-- MD3 button styling: pill shape for dialog actions
-		local btnCorner = Button.Frame:FindFirstChildOfClass("UICorner")
-		if btnCorner then btnCorner.CornerRadius = UDim.new(1, 0) end
-		local hoverCorner = Button.HoverFrame:FindFirstChildOfClass("UICorner")
-		if hoverCorner then hoverCorner.CornerRadius = UDim.new(1, 0) end
 
 		for _, Btn in next, NewDialog.ButtonHolder:GetChildren() do
 			if Btn:IsA("TextButton") then

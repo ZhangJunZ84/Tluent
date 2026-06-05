@@ -39,7 +39,6 @@ do
         Title = Fluent.Version,
         Icon = "info", -- Optional
         Color = Color3.fromHex("#a1ff9e"), -- Optional, if not set, the color will be the same as the theme
-        Radius = 6, -- Optional, Default: 6
     })
 
     -- You can change the color of the tag with the `SetColor` method
@@ -64,8 +63,8 @@ do
     end)
 
     Window:Tag({
-        Title = "Created by TWVZ",
-        Icon = "flag",
+        Title = "TWVZ",
+        Icon = "hat-glasses",
     })
 
     Tabs.Main:AddSection({ Title = "Default Section" })

@@ -20,8 +20,8 @@ function Paragraph:New(Config)
 	local Justify = JustifyMap[Config.Justify] or JustifyMap.Left
 
 	local Paragraph = require(Components.Element)(Config.Title, Config.Content, Paragraph.Container, false)
-	Paragraph.Frame.BackgroundTransparency = 0.92
-	Paragraph.Border.Transparency = 0.6
+	Paragraph.Frame.BackgroundTransparency = 0.9
+	Paragraph.Border.Transparency = 0.4
 	Paragraph.TitleLabel.TextXAlignment = Justify
 	Paragraph.DescLabel.TextXAlignment = Justify
 

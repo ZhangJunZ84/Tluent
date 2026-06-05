@@ -38,10 +38,10 @@ function Element:New(Idx, Config)
 	Keybind.SetDesc = KeybindFrame.SetDesc
 
 	local KeybindDisplayLabel = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 		Text = Config.Default,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 14,
+		TextSize = 16,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		Size = UDim2.new(0, 0, 0, 14),
 		Position = UDim2.new(0, 0, 0.5, 0),

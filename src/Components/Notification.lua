@@ -44,8 +44,8 @@ function Notification:New(Config)
 		RichText = true,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextTransparency = 0,
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Medium),
-		TextSize = 14,
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold),
+		TextSize = 15,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
 		Size = UDim2.new(1, -12, 0, 12),
@@ -57,7 +57,7 @@ function Notification:New(Config)
 	})
 
 	NewNotification.ContentLabel = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
 		Text = Config.Content,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
 		TextSize = 14,
@@ -73,7 +73,7 @@ function Notification:New(Config)
 	})
 
 	NewNotification.SubContentLabel = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
 		Text = Config.SubContent,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
 		TextSize = 14,
@@ -132,7 +132,7 @@ function Notification:New(Config)
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 12),
+			CornerRadius = UDim.new(0, 8),
 		}),
 		New("UIStroke", {
 			Transparency = 0.5,
@@ -168,7 +168,7 @@ function Notification:New(Config)
 		BackgroundTransparency = 0.8,
 		Parent = NewNotification.Root,
 		ThemeTag = {
-			BackgroundColor3 = "Primary",
+			BackgroundColor3 = "Accent",
 		},
 	}, {
 		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
@@ -179,7 +179,7 @@ function Notification:New(Config)
 		BorderSizePixel = 0,
 		Parent = ProgressTrack,
 		ThemeTag = {
-			BackgroundColor3 = "Primary",
+			BackgroundColor3 = "Accent",
 		},
 	}, {
 		New("UICorner", { CornerRadius = UDim.new(1, 0) }),

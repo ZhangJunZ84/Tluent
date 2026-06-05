@@ -37,7 +37,7 @@ local Library = {
 	DialogOpen = false,
 	UseAcrylic = false,
 	Acrylic = false,
-	Transparency = true,
+	Transparency = false,
 	MinimizeKeybind = nil,
 	MinimizeKey = Enum.KeyCode.LeftControl,
 
@@ -116,18 +116,9 @@ function Library:CreateWindow(Config)
 	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
 	Library.UseAcrylic = Config.Acrylic or false
 	Library.Acrylic = Config.Acrylic or false
-	if Config.SeedColor then
-		local MaterialColor = require(Root.Themes.MaterialColor)
-		local CustomTheme = MaterialColor.Generate(Config.SeedColor, Config.DarkMode == nil and true or Config.DarkMode)
-		CustomTheme.Name = "Custom"
-		require(Root.Themes)["Custom"] = CustomTheme
-		table.insert(Library.Themes, "Custom")
-		Library.Theme = "Custom"
-	else
-		Library.Theme = Config.Theme or "Dark"
-	end
+	Library.Theme = Config.Theme or "Dark"
 
-	Library.Transparency = Config.Transparency == nil and true or Config.Transparency
+	Library.Transparency = Config.Transparency or false
 	if Config.Acrylic then
 		Acrylic.init()
 	end
@@ -190,6 +181,23 @@ end
 function Library:ToggleTransparency(Value)
 	if Library.Window then
 		Library.Window.AcrylicPaint.Frame.Background.BackgroundTransparency = Value and 0.35 or 0
+		
+		local sidebarTrans = Value and 1 or 0
+		local contentTrans = Value and 0.7 or 0
+
+		local function updateTrans(frame, trans)
+			if frame then
+				frame.BackgroundTransparency = trans
+				for _, child in ipairs(frame:GetChildren()) do
+					if child:IsA("Frame") and string.find(child.Name, "Cover") then
+						child.BackgroundTransparency = trans
+					end
+				end
+			end
+		end
+
+		updateTrans(Library.Window.SidebarBackground, sidebarTrans)
+		updateTrans(Library.Window.ContentBackground, contentTrans)
 	end
 end
 

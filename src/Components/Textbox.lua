@@ -9,9 +9,9 @@ return function(Parent, Acrylic)
 	local Textbox = {}
 
 	Textbox.Input = New("TextBox", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
 		TextColor3 = Color3.fromRGB(200, 200, 200),
-		TextSize = 14,
+		TextSize = 15,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Center,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -35,8 +35,8 @@ return function(Parent, Acrylic)
 	})
 
 	Textbox.Indicator = New("Frame", {
-		Size = UDim2.new(1, -4, 0, 1),
-		Position = UDim2.new(0, 2, 1, 0),
+		Size = UDim2.new(1, -16, 0, 1),
+		Position = UDim2.new(0, 8, 1, -1),
 		AnchorPoint = Vector2.new(0, 1),
 		BackgroundTransparency = Acrylic and 0.5 or 0,
 		ThemeTag = {
@@ -109,17 +109,17 @@ return function(Parent, Acrylic)
 
 	Creator.AddSignal(Textbox.Input.Focused, function()
 		Update()
-		Textbox.Indicator.Size = UDim2.new(1, -2, 0, 2)
-		Textbox.Indicator.Position = UDim2.new(0, 1, 1, 0)
+		Textbox.Indicator.Size = UDim2.new(1, -16, 0, 2)
+		Textbox.Indicator.Position = UDim2.new(0, 8, 1, -1)
 		Textbox.Indicator.BackgroundTransparency = 0
 		Creator.OverrideTag(Textbox.Frame, { BackgroundColor3 = Acrylic and "InputFocused" or "DialogHolder" })
-		Creator.OverrideTag(Textbox.Indicator, { BackgroundColor3 = "Primary" })
+		Creator.OverrideTag(Textbox.Indicator, { BackgroundColor3 = "Accent" })
 	end)
 
 	Creator.AddSignal(Textbox.Input.FocusLost, function()
 		Update()
-		Textbox.Indicator.Size = UDim2.new(1, -4, 0, 1)
-		Textbox.Indicator.Position = UDim2.new(0, 2, 1, 0)
+		Textbox.Indicator.Size = UDim2.new(1, -16, 0, 1)
+		Textbox.Indicator.Position = UDim2.new(0, 8, 1, -1)
 		Textbox.Indicator.BackgroundTransparency = 0.5
 		Creator.OverrideTag(Textbox.Frame, { BackgroundColor3 = Acrylic and "Input" or "DialogInput" })
 		Creator.OverrideTag(Textbox.Indicator, { BackgroundColor3 = Acrylic and "InputIndicator" or "DialogInputLine" })

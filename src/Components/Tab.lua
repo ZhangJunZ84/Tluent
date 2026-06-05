@@ -50,15 +50,15 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 
 	local IconObject = Icons.Image({
 		Icon = Icon,
-		Size = UDim2.fromOffset(18, 18),
+		Size = UDim2.fromOffset(16, 16),
 		Colors = { "Tab" }
 	})
 	local IconFrame = IconObject.IconFrame
 	IconFrame.AnchorPoint = IsIconMode and Vector2.new(0.5, 0.5) or Vector2.new(0, 0.5)
 	IconFrame.Position = IsIconMode and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0, 12, 0.5, 0)
 
-	local LabelOffset = Icon and 36 or 12
-	local LabelRightPadding = 12
+	local LabelOffset = Icon and 32 or 12
+	local LabelRightPadding = 10
 	local TextLabel = not IsIconMode and New("TextLabel", {
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, LabelOffset, 0.5, 0),
@@ -67,11 +67,11 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextTransparency = 0,
 		FontFace = Font.new(
-			"rbxasset://fonts/families/Roboto.json",
+			"rbxassetid://12187372629",
 			Enum.FontWeight.Medium,
 			Enum.FontStyle.Normal
 		),
-		TextSize = 14,
+		TextSize = 13,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
 		Size = UDim2.new(1, -LabelOffset - LabelRightPadding, 1, 0),
@@ -81,16 +81,17 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		},
 	}) or nil
 
+
 	Tab.Frame = New("TextButton", {
-		Size = UDim2.new(1, 0, 0, 40),
+		Size = UDim2.new(1, 0, 0, 36),
 		BackgroundTransparency = 1,
 		Parent = Parent,
 		ThemeTag = {
-			BackgroundColor3 = "SecondaryContainer",
+			BackgroundColor3 = "SelectedTabBackground",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 12), -- Sleek modern rounded corners
+			CornerRadius = UDim.new(0, 8),
 		}),
 		TextLabel,
 		IconFrame,
@@ -113,8 +114,24 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		SortOrder = Enum.SortOrder.LayoutOrder,
 	})
 
+	local TabTitleLabel = New("TextLabel", {
+		RichText = true,
+		Text = Title,
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+		TextSize = 22,
+		TextXAlignment = "Left",
+		TextYAlignment = "Center",
+		Size = UDim2.new(1, 0, 0, 32),
+		BackgroundTransparency = 1,
+		LayoutOrder = -1,
+		ThemeTag = {
+			TextColor3 = "Text",
+		},
+	})
+
 	Tab.ContainerFrame = New("ScrollingFrame", {
-		Size = UDim2.fromScale(1, 1),
+		Size = UDim2.new(1, 0, 1, -16),
+		Position = UDim2.fromOffset(0, 8),
 		BackgroundTransparency = 1,
 		Parent = Window.ContainerHolder,
 		Visible = false,
@@ -129,16 +146,17 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 	}, {
 		ContainerLayout,
+		TabTitleLabel,
 		New("UIPadding", {
 			PaddingRight = UDim.new(0, 10),
 			PaddingLeft = UDim.new(0, 1),
-			PaddingTop = UDim.new(0, 1),
-			PaddingBottom = UDim.new(0, 1),
+			PaddingTop = UDim.new(0, 8),
+			PaddingBottom = UDim.new(0, 8),
 		}),
 	})
 
 	Creator.AddSignal(ContainerLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-		Tab.ContainerFrame.CanvasSize = UDim2.new(0, 0, 0, ContainerLayout.AbsoluteContentSize.Y + 2)
+		Tab.ContainerFrame.CanvasSize = UDim2.new(0, 0, 0, ContainerLayout.AbsoluteContentSize.Y + 20)
 	end)
 
 	Tab.Motor, Tab.SetTransparency = Creator.SpringMotor(1, Tab.Frame, "BackgroundTransparency")
@@ -301,11 +319,11 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		table.insert(Children, New("TextLabel", {
 			Text = Config.Title or "",
 			FontFace = Font.new(
-				"rbxasset://fonts/families/Roboto.json",
-				Enum.FontWeight.Medium,
+				"rbxassetid://12187372629",
+				Enum.FontWeight.Bold,
 				Enum.FontStyle.Normal
 			),
-			TextSize = 10,
+			TextSize = 12,
 			TextColor3 = LabelColor,
 			ThemeTag = LabelThemeTag,
 			BackgroundTransparency = 1,
@@ -490,9 +508,10 @@ function TabModule:SelectTab(Tab)
 	for _, TabObject in next, TabModule.Tabs do
 		TabObject.SetTransparency(1)
 		TabObject.Selected = false
+		Creator.OverrideTag(TabObject.Frame, { BackgroundColor3 = "SelectedTabBackground" })
 		local TextLabel = TabObject.Frame:FindFirstChildOfClass("TextLabel")
 		local IconFrame = TabObject.Frame:FindFirstChild("IconFrame")
-		
+
 		if TextLabel then
 			Creator.OverrideTag(TextLabel, { TextColor3 = "Tab" })
 		end
@@ -501,19 +520,33 @@ function TabModule:SelectTab(Tab)
 		end
 	end
 	
-	TabModule.Tabs[Tab].SetTransparency(0)
+	Creator.OverrideTag(TabModule.Tabs[Tab].Frame, { BackgroundColor3 = "Accent" })
+	TabModule.Tabs[Tab].SetTransparency(0.84)
 	TabModule.Tabs[Tab].Selected = true
-	
+
 	local SelectedTextLabel = TabModule.Tabs[Tab].Frame:FindFirstChildOfClass("TextLabel")
 	local SelectedIconFrame = TabModule.Tabs[Tab].Frame:FindFirstChild("IconFrame")
+
 	if SelectedTextLabel then
-		Creator.OverrideTag(SelectedTextLabel, { TextColor3 = "OnSecondaryContainer" })
+		Creator.OverrideTag(SelectedTextLabel, { TextColor3 = "Tab" })
 	end
 	if SelectedIconFrame and SelectedIconFrame:FindFirstChild("Icon") then
-		Creator.OverrideTag(SelectedIconFrame.Icon, { ImageColor3 = "OnSecondaryContainer" })
+		Creator.OverrideTag(SelectedIconFrame.Icon, { ImageColor3 = "Accent" })
 	end
 
-	Window.TabDisplay.Text = TabModule.Tabs[Tab].Name
+	-- Animate shared sidebar indicator to selected tab's Y position
+	if Window.SidebarIndicator then
+		local tabFrame = TabModule.Tabs[Tab].Frame
+		local tabAbsY = tabFrame.AbsolutePosition.Y
+		local windowAbsY = Window.Root.AbsolutePosition.Y
+		local relY = tabAbsY - windowAbsY + tabFrame.AbsoluteSize.Y / 2
+		TweenService:Create(
+			Window.SidebarIndicator,
+			TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ Position = UDim2.fromOffset(0, relY), BackgroundTransparency = 0 }
+		):Play()
+	end
+
 
 	for _, Container in next, TabModule.Containers do
 		Container.Visible = false

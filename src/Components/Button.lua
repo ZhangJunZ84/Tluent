@@ -12,7 +12,7 @@ return function(Theme, Parent, DialogCheck)
 	Button.Title = New("TextLabel", {
 		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 		TextColor3 = Color3.fromRGB(200, 200, 200),
-		TextSize = 14,
+		TextSize = 16,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,

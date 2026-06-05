@@ -20,7 +20,7 @@ return function(Title, Parent, Justify)
 
 	Section.Container = New("Frame", {
 		Size = UDim2.new(1, 0, 0, 26),
-		Position = UDim2.fromOffset(0, 24),
+		Position = UDim2.fromOffset(0, 27),
 		BackgroundTransparency = 1,
 	}, {
 		Section.Layout,
@@ -36,7 +36,7 @@ return function(Title, Parent, Justify)
 			RichText = true,
 			Text = Title,
 			TextTransparency = 0,
-			FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+			FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 			TextSize = 18,
 			TextXAlignment = Justify,
 			TextYAlignment = "Center",
@@ -51,7 +51,7 @@ return function(Title, Parent, Justify)
 
 	Creator.AddSignal(Section.Layout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
 		Section.Container.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y)
-		Section.Root.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y + 25)
+		Section.Root.Size = UDim2.new(1, 0, 0, Section.Layout.AbsoluteContentSize.Y + 28)
 	end)
 	return Section
 end

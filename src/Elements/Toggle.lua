@@ -31,7 +31,7 @@ function Element:New(Idx, Config)
 		Position = UDim2.new(0, 4, 0.5, 0),
 		BackgroundColor3 = Color3.new(1, 1, 1),
 		ThemeTag = {
-			BackgroundColor3 = "Outline",
+			BackgroundColor3 = "ToggleSlider",
 		},
 	}, {
 		New("UICorner", {
@@ -43,7 +43,7 @@ function Element:New(Idx, Config)
 		Transparency = 0,
 		Thickness = 2,
 		ThemeTag = {
-			Color = "Outline",
+			Color = "ToggleSlider",
 		},
 	})
 
@@ -54,7 +54,7 @@ function Element:New(Idx, Config)
 		Parent = ToggleFrame.Frame,
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			BackgroundColor3 = "Primary",
+			BackgroundColor3 = "Accent",
 		},
 	}, {
 		New("UICorner", {
@@ -73,18 +73,16 @@ function Element:New(Idx, Config)
 		Value = not not Value
 		Toggle.Value = Value
 
-		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Primary" or "Outline" })
+		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
 		ToggleBorder.Transparency = Toggle.Value and 1 or 0
-		Creator.OverrideTag(ToggleCircle, { BackgroundColor3 = Toggle.Value and "OnPrimary" or "Outline" })
+		Creator.OverrideTag(ToggleCircle, { BackgroundColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })
 		
-		-- MD3 switch thumb expands slightly when active, but moving it is standard
-		local circleSize = Toggle.Value and 20 or 16
-		local circlePos = Toggle.Value and 20 or 4
+		local circlePos = Toggle.Value and 24 or 4
 		
 		TweenService:Create(
 			ToggleCircle,
 			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-			{ Position = UDim2.new(0, circlePos, 0.5, 0), Size = UDim2.fromOffset(circleSize, circleSize) }
+			{ Position = UDim2.new(0, circlePos, 0.5, 0), Size = UDim2.fromOffset(16, 16) }
 		):Play()
 		TweenService:Create(
 			ToggleSlider,

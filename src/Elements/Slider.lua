@@ -40,7 +40,7 @@ function Element:New(Idx, Config)
 		Size = UDim2.fromOffset(20, 20),
 		BackgroundColor3 = Color3.new(1, 1, 1),
 		ThemeTag = {
-			BackgroundColor3 = "Primary",
+			BackgroundColor3 = "Accent",
 		},
 	}, {
 		New("UICorner", { CornerRadius = UDim.new(1, 0) })
@@ -66,7 +66,7 @@ function Element:New(Idx, Config)
 	local SliderFill = New("Frame", {
 		Size = UDim2.new(0, 0, 1, 0),
 		ThemeTag = {
-			BackgroundColor3 = "Primary",
+			BackgroundColor3 = "Accent",
 		},
 	}, {
 		New("UICorner", {
@@ -75,9 +75,9 @@ function Element:New(Idx, Config)
 	})
 
 	local SliderDisplay = New("TextBox", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Medium),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold),
 		Text = "Value",
-		TextSize = 14,
+		TextSize = 16,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Right,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),

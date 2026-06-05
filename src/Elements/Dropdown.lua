@@ -38,10 +38,10 @@ function Element:New(Idx, Config)
 	Dropdown.SetDesc = DropdownFrame.SetDesc
 
 	local DropdownDisplay = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
 		Text = "Value",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 14,
+		TextSize = 15,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Size = UDim2.new(1, -30, 0, 14),
 		Position = UDim2.new(0, 8, 0.5, 0),
@@ -117,7 +117,7 @@ function Element:New(Idx, Config)
 	}, {
 		DropdownScrollFrame,
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 12),
+			CornerRadius = UDim.new(0, 8),
 		}),
 		New("UIStroke", {
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
@@ -166,12 +166,12 @@ function Element:New(Idx, Config)
 		})
 
 		SearchBox = New("TextBox", {
-			FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+			FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
 			Text = "",
 			PlaceholderText = "Search...",
 			TextColor3 = Color3.fromRGB(200, 200, 200),
 			PlaceholderColor3 = Color3.fromRGB(150, 150, 150),
-			TextSize = 14,
+			TextSize = 16,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			Size = UDim2.new(1, -38, 1, 0),
 			Position = UDim2.fromOffset(34, 0),
@@ -380,10 +380,10 @@ function Element:New(Idx, Config)
 				ButtonSelector.AnchorPoint = Vector2.new(0, 0.5)
 
 				ButtonLabel = New("TextLabel", {
-					FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+					FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
 					Text = Value,
 					TextColor3 = Color3.fromRGB(200, 200, 200),
-					TextSize = 14,
+					TextSize = 15,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 					AutomaticSize = Enum.AutomaticSize.Y,
@@ -533,10 +533,10 @@ function Element:New(Idx, Config)
 		if Count == 0 and SearchEnabled and Dropdown.SearchFilter ~= "" then
 			if not Dropdown.NoResultsLabel then
 				Dropdown.NoResultsLabel = New("TextLabel", {
-					FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+					FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
 					Text = "No results found",
 					TextColor3 = Color3.fromRGB(200, 200, 200),
-					TextSize = 14,
+					TextSize = 15,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, -5, 0, 32),
 					ThemeTag = {

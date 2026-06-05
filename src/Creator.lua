@@ -29,7 +29,7 @@ local Creator = {
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
 			BackgroundTransparency = 1,
-			TextSize = 14,
+			TextSize = 16,
 		},
 		TextButton = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
@@ -38,7 +38,7 @@ local Creator = {
 			Font = Enum.Font.Roboto,
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
-			TextSize = 14,
+			TextSize = 16,
 		},
 		TextBox = {
 			BackgroundColor3 = Color3.new(1, 1, 1),
@@ -47,7 +47,7 @@ local Creator = {
 			Font = Enum.Font.Roboto,
 			Text = "",
 			TextColor3 = Color3.new(0, 0, 0),
-			TextSize = 14,
+			TextSize = 16,
 		},
 		ImageLabel = {
 			BackgroundTransparency = 1,
@@ -89,7 +89,7 @@ function Creator.CreateRipple(Button)
 			ZIndex = 100,
 		})
 		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = Overlay })
-		Creator.AddThemeObject(Overlay, { BackgroundColor3 = "OnSurface" })
+		Creator.AddThemeObject(Overlay, { BackgroundColor3 = "Hover" })
 
 		local Tween = TweenService:Create(Overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			BackgroundTransparency = 1
@@ -124,9 +124,22 @@ function Creator.Disconnect()
 end
 
 function Creator.GetThemeProperty(Property)
-	if Themes[require(Root).Theme][Property] then
-		return Themes[require(Root).Theme][Property]
+	local ThemeTable = Themes[require(Root).Theme] or Themes["Dark"]
+	if ThemeTable[Property] then
+		return ThemeTable[Property]
 	end
+
+	-- Fallbacks for new structural properties in case older themes do not define them
+	if Property == "SidebarBackground" then
+		return ThemeTable.DialogHolder or ThemeTable.AcrylicMain
+	elseif Property == "ContentBackground" then
+		return ThemeTable.AcrylicMain or ThemeTable.Dialog
+	elseif Property == "SelectedTabBackground" then
+		return ThemeTable.Dialog
+	elseif Property == "SelectedTabText" then
+		return ThemeTable.Accent or ThemeTable.Text
+	end
+
 	return Themes["Dark"][Property]
 end
 

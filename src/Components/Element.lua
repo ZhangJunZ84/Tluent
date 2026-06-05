@@ -9,7 +9,7 @@ return function(Title, Desc, Parent, Hover)
 	local Element = {}
 
 	Element.TitleLabel = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 		Text = Title,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
 		TextSize = 16,
@@ -23,7 +23,7 @@ return function(Title, Desc, Parent, Hover)
 	})
 
 	Element.DescLabel = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
 		Text = Desc,
 		TextColor3 = Color3.fromRGB(200, 200, 200),
 		TextSize = 14,
@@ -58,7 +58,7 @@ return function(Title, Desc, Parent, Hover)
 	})
 
 	Element.Border = New("UIStroke", {
-		Transparency = 0.5,
+		Transparency = 0.3,
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Color = Color3.fromRGB(0, 0, 0),
 		ThemeTag = {
@@ -80,7 +80,7 @@ return function(Title, Desc, Parent, Hover)
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 12),
+			CornerRadius = UDim.new(0, 8),
 		}),
 		Element.Border,
 		Element.LabelHolder,

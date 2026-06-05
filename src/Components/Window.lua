@@ -67,29 +67,15 @@ return function(Config)
 	})
 
 	local TabFrame = New("Frame", {
-		Size = UDim2.new(0, Window.TabWidth, 1, -(66 + BarOffset)),
-		Position = UDim2.new(0, 12, 0, 54 + BarOffset),
+		Size = UDim2.new(0, Window.TabWidth, 1, -(64 + BarOffset)),
+		Position = UDim2.new(0, 12, 0, 52 + BarOffset),
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 	}, {
 		Window.TabHolder
 	})
 
-	Window.TabDisplay = New("TextLabel", {
-		RichText = true,
-		Text = "Tab",
-		TextTransparency = 0,
-		FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
-		TextSize = 28,
-		TextXAlignment = "Left",
-		TextYAlignment = "Center",
-		Size = UDim2.new(1, -16, 0, 28),
-		Position = UDim2.fromOffset(Window.TabWidth + 26, 56 + BarOffset),
-		BackgroundTransparency = 1,
-		ThemeTag = {
-			TextColor3 = "Text",
-		},
-	})
+	-- TabDisplay removed: tab name is now rendered inside the scrollable content of each tab
 
 	Window.ContainerHolder = New("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -97,12 +83,139 @@ return function(Config)
 	})
 
 	Window.ContainerCanvas = New("Frame", {
-		Size = UDim2.new(1, -Window.TabWidth - 32, 1, -(102 + BarOffset)),
-		Position = UDim2.fromOffset(Window.TabWidth + 26, 90 + BarOffset),
+		Size = UDim2.new(1, -Window.TabWidth - 48, 1, -(40 + BarOffset)),
+		Position = UDim2.fromOffset(Window.TabWidth + 36, 40 + BarOffset),
 		BackgroundTransparency = 1,
 	}, {
 		Window.ContainerHolder
 	})
+
+	-- Shared indicator that slides along the sidebar left edge
+	Window.SidebarIndicator = New("Frame", {
+		Name = "SidebarIndicator",
+		Size = UDim2.fromOffset(3, 18),
+		Position = UDim2.fromOffset(0, 52 + BarOffset),
+		AnchorPoint = Vector2.new(0, 0.5),
+		BackgroundTransparency = 1,
+		ZIndex = 4,
+		ThemeTag = {
+			BackgroundColor3 = "Accent",
+		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(1, 0),
+		}),
+	})
+
+	-- Horizontal Divider under the Titlebar
+	local TitleBarDivider = New("Frame", {
+		Name = "TitleBarDivider",
+		Size = UDim2.new(1, 0, 0, 1),
+		Position = UDim2.new(0, 0, 0, 40),
+		BorderSizePixel = 0,
+		ThemeTag = {
+			BackgroundColor3 = "TitleBarLine",
+		},
+	})
+
+	-- Vertical Divider between Sidebar and Content
+	local SidebarDivider = New("Frame", {
+		Name = "SidebarDivider",
+		Size = UDim2.new(0, 1, 1, -40),
+		Position = UDim2.new(0, Window.TabWidth + 24, 0, 40),
+		BorderSizePixel = 0,
+		ThemeTag = {
+			BackgroundColor3 = "TitleBarLine",
+		},
+	})
+
+	-- Sidebar solid background (rounded bottom-left corner)
+	local SidebarBackground = New("Frame", {
+		Name = "SidebarBackground",
+		Size = UDim2.new(0, Window.TabWidth + 24, 1, -40),
+		Position = UDim2.new(0, 0, 0, 40),
+		BorderSizePixel = 0,
+		ThemeTag = {
+			BackgroundColor3 = "SidebarBackground",
+		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(0, 8),
+		}),
+		-- Corner covers to make specific corners square instead of rounded
+		New("Frame", {
+			Name = "SidebarBackgroundCoverTopLeft",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.fromOffset(0, 0),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "SidebarBackground",
+			},
+		}),
+		New("Frame", {
+			Name = "SidebarBackgroundCoverTopRight",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.new(1, -8, 0, 0),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "SidebarBackground",
+			},
+		}),
+		New("Frame", {
+			Name = "SidebarBackgroundCoverBottomRight",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.new(1, -8, 1, -8),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "SidebarBackground",
+			},
+		}),
+	})
+	Window.SidebarBackground = SidebarBackground
+
+	-- Content solid background (rounded bottom-right corner)
+	local ContentBackground = New("Frame", {
+		Name = "ContentBackground",
+		Size = UDim2.new(1, -(Window.TabWidth + 25), 1, -40),
+		Position = UDim2.new(0, Window.TabWidth + 25, 0, 40),
+		BorderSizePixel = 0,
+		ThemeTag = {
+			BackgroundColor3 = "ContentBackground",
+		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(0, 8),
+		}),
+		-- Corner covers to make specific corners square instead of rounded
+		New("Frame", {
+			Name = "ContentBackgroundCoverTopLeft",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.fromOffset(0, 0),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "ContentBackground",
+			},
+		}),
+		New("Frame", {
+			Name = "ContentBackgroundCoverBottomLeft",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.new(0, 0, 1, -8),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "ContentBackground",
+			},
+		}),
+		New("Frame", {
+			Name = "ContentBackgroundCoverTopRight",
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.new(1, -8, 0, 0),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "ContentBackground",
+			},
+		}),
+	})
+	Window.ContentBackground = ContentBackground
 
 	Window.Root = New("Frame", {
 		BackgroundTransparency = 1,
@@ -111,11 +224,16 @@ return function(Config)
 		Parent = Config.Parent,
 	}, {
 		Window.AcrylicPaint.Frame,
-		Window.TabDisplay,
+		SidebarBackground,
+		ContentBackground,
+		TitleBarDivider,
+		SidebarDivider,
+		Window.SidebarIndicator,
 		Window.ContainerCanvas,
 		TabFrame,
 		ResizeStartFrame,
 	})
+
 
 	Window.TitleBar = require(script.Parent.TitleBar)({
 		Title = Config.Title,
@@ -511,13 +629,13 @@ return function(Config)
 
 		local Content = New("TextLabel", {
 			FontFace = Font.new(
-				"rbxasset://fonts/families/Roboto.json",
+				"rbxassetid://12187372629",
 				Enum.FontWeight.Regular,
 				Enum.FontStyle.Normal
 			),
 			Text = Config.Content,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
-			TextSize = 14,
+			TextSize = 16,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			Size = UDim2.new(1, -48, 1, 0),
@@ -536,12 +654,13 @@ return function(Config)
 			Parent = Dialog.Root,
 		})
 
-		Dialog.Root.Size = UDim2.fromOffset(Content.TextBounds.X + 40, 165)
-		if Content.TextBounds.X + 40 > Window.Size.X.Offset - 120 then
-			Dialog.Root.Size = UDim2.fromOffset(Window.Size.X.Offset - 120, 165)
-			Content.TextWrapped = true
-			Dialog.Root.Size = UDim2.fromOffset(Window.Size.X.Offset - 120, Content.TextBounds.Y + 150)
-		end
+		local dialogWidth = math.clamp(Content.TextBounds.X + 48, 300, math.max(300, Window.Size.X.Offset - 120))
+		Content.Size = UDim2.new(0, dialogWidth - 48, 0, 0)
+		Content.TextWrapped = true
+		
+		local dialogHeight = math.max(165, Content.TextBounds.Y + 150)
+		Dialog.Root.Size = UDim2.fromOffset(dialogWidth, dialogHeight)
+		Content.Size = UDim2.new(1, -48, 0, Content.TextBounds.Y)
 
 		for _, Button in next, Config.Buttons do
 			Dialog:Button(Button.Title, Button.Callback)
