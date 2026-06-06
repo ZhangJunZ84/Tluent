@@ -34,16 +34,34 @@ function Element:New(Idx, Config)
 	Slider.SetTitle = SliderFrame.SetTitle
 	Slider.SetDesc = SliderFrame.SetDesc
 
+	local SoccerBallLabel = New("ImageLabel", {
+		Image = "rbxassetid://4642432897",
+		Size = UDim2.fromScale(1, 1),
+		Position = UDim2.fromScale(0.5, 0.5),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		Visible = false,
+		ZIndex = 5,
+	})
+
 	local SliderDot = New("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
 		Position = UDim2.new(0, -10, 0.5, 0),
 		Size = UDim2.fromOffset(20, 20),
 		BackgroundColor3 = Color3.new(1, 1, 1),
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
 	}, {
-		New("UICorner", { CornerRadius = UDim.new(1, 0) })
+		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+		SoccerBallLabel,
+	})
+
+	Creator.AddThemeObject(SliderDot, {
+		BackgroundColor3 = function(GetTheme)
+			local isBrasil = (Library.Theme == "Brasil")
+			SoccerBallLabel.Visible = isBrasil
+			SliderDot.BackgroundTransparency = isBrasil and 1 or 0
+			SliderDot.Size = isBrasil and UDim2.fromOffset(24, 24) or UDim2.fromOffset(20, 20)
+			SliderDot.BackgroundColor3 = GetTheme("Accent")
+		end,
 	})
 
 	local SliderHitbox = New("TextButton", {
@@ -172,9 +190,16 @@ function Element:New(Idx, Config)
 
 	function Slider:SetValue(Value)
 		self.Value = Library:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding)
-		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -10, 0.5, 0)
+		
+		local isBrasil = (Library.Theme == "Brasil")
+		local offset = isBrasil and -12 or -10
+		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), offset, 0.5, 0)
+		
 		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 		SliderDisplay.Text = tostring(self.Value)
+
+		local percent = (self.Value - Slider.Min) / (Slider.Max - Slider.Min)
+		SoccerBallLabel.Rotation = percent * 360 * 3
 
 		Library:SafeCallback(Slider.Callback, self.Value)
 		Library:SafeCallback(Slider.Changed, self.Value)
