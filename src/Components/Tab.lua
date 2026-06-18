@@ -6,7 +6,6 @@ local TweenService = game:GetService("TweenService")
 
 local New = Creator.New
 local Spring = Flipper.Spring.new
-local Instant = Flipper.Instant.new
 local Components = Root.Components
 
 local TabModule = {
@@ -247,16 +246,7 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 			end
 		end
 
-		local Radius = math.clamp(Config.Radius or 3, 0, 10)
 
-		local StrokeColor, StrokeThemeTag
-		if UseTheme then
-			StrokeColor = Creator.GetThemeProperty("Accent")
-			StrokeThemeTag = { Color = "Accent" }
-		else
-			StrokeColor = TextColor or (not IsGradient and BgColor) or Color3.fromRGB(255, 255, 255)
-			StrokeThemeTag = nil
-		end
 
 		local Children = {
 			New("UICorner", {
@@ -283,17 +273,7 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 			}))
 		end
 
-		local IconColor, IconThemeTag
-		if TextColor then
-			IconColor = TextColor
-			IconThemeTag = nil
-		elseif UseTheme then
-			IconColor = Creator.GetThemeProperty("Accent")
-			IconThemeTag = { ImageColor3 = "Accent" }
-		else
-			IconColor = Color3.fromRGB(255, 255, 255)
-			IconThemeTag = nil
-		end
+
 
 		if Config.Icon then
 			local IconObject = Icons.Image({
@@ -468,13 +448,7 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 				end
 			end
 
-			local UIStroke = TagFrame:FindFirstChildOfClass("UIStroke")
-			if UIStroke then
-				UIStroke.Color = StrokeColor
-				if Creator.Registry[UIStroke] then
-					Creator.Registry[UIStroke].Properties.Color = nil
-				end
-			end
+
 
 			if Creator.Registry[TagFrame] then
 				Creator.Registry[TagFrame].Properties.BackgroundColor3 = nil

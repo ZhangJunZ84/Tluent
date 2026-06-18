@@ -5,7 +5,6 @@ local Camera = game:GetService("Workspace").CurrentCamera
 
 local Root = script.Parent.Parent
 local Creator = require(Root.Creator)
-local Flipper = require(Root.Packages.Flipper)
 local Icons = require(Root.Icons)
 
 local New = Creator.New

@@ -1,13 +1,6 @@
-local UserInputService = game:GetService("UserInputService")
-local Mouse = game:GetService("Players").LocalPlayer:GetMouse()
-local Camera = game:GetService("Workspace").CurrentCamera
-
 local Root = script.Parent.Parent
-local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 
-local Spring = Flipper.Spring.new
-local Instant = Flipper.Instant.new
 local New = Creator.New
 
 local Dialog = {
@@ -134,7 +127,7 @@ function Dialog:Create()
 		Title = Title or "Button"
 		Callback = Callback or function() end
 
-		local Button = require(Root.Components.Button)("", NewDialog.ButtonHolder, true)
+		local Button = require(Root.Components.Button)(NewDialog.ButtonHolder, true)
 		Button.Title.Text = Title
 
 		for _, Btn in next, NewDialog.ButtonHolder:GetChildren() do

@@ -1,9 +1,6 @@
 local Root = script.Parent.Parent
-local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local New = Creator.New
-
-local Spring = Flipper.Spring.new
 
 return function(Title, Desc, Parent, Hover)
 	local Element = {}
@@ -111,7 +108,6 @@ return function(Title, Desc, Parent, Hover)
 
 	if Hover then
 		Creator.CreateRipple(Element.Frame)
-		local Themes = Root.Themes
 		local Motor, SetTransparency = Creator.SpringMotor(
 			Creator.GetThemeProperty("ElementTransparency"),
 			Element.Frame,

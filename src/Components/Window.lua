@@ -473,7 +473,7 @@ return function(Config)
 			uiCorner.Parent = frame
 
 			local uiStroke = Instance.new("UIStroke")
-			uiStroke.Thickness = 2.5
+			uiStroke.Thickness = 1.8
 			uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			uiStroke.Parent = frame
 		end

@@ -1,5 +1,4 @@
 local UserInputService = game:GetService("UserInputService")
-local TouchInputService = game:GetService("TouchInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 

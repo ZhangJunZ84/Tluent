@@ -1,10 +1,5 @@
-local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local Camera = game:GetService("Workspace").CurrentCamera
-local Mouse = LocalPlayer:GetMouse()
 
 local Root = script
 local Creator = require(Root.Creator)
@@ -30,7 +25,6 @@ local Library = {
 	Themes = require(Root.Themes).Names,
 
 	Window = nil,
-	WindowFrame = nil,
 	Unloaded = false,
 
 	Theme = "Dark",

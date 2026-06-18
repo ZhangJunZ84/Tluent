@@ -170,11 +170,9 @@ local function ApplyThemeToObject(Object, Properties)
 end
 
 function Creator.AddThemeObject(Object, Properties)
-	local Idx = #Creator.Registry + 1
 	local Data = {
 		Object = Object,
 		Properties = Properties,
-		Idx = Idx,
 	}
 
 	Creator.Registry[Object] = Data

@@ -2,11 +2,9 @@ local Root = script.Parent.Parent
 local Flipper = require(Root.Packages.Flipper)
 local Creator = require(Root.Creator)
 local Icons = require(Root.Icons)
-local Acrylic = require(Root.Acrylic)
 local TweenService = game:GetService("TweenService")
 
 local Spring = Flipper.Spring.new
-local Instant = Flipper.Instant.new
 local New = Creator.New
 
 local Notification = {}

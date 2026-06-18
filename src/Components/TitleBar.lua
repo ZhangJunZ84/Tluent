@@ -1,7 +1,6 @@
 local Root = script.Parent.Parent
 local Creator = require(Root.Creator)
 local Icons = require(Root.Icons)
-local Flipper = require(Root.Packages.Flipper)
 
 local New = Creator.New
 local AddSignal = Creator.AddSignal
@@ -267,16 +266,7 @@ return function(Config)
 
 		local Radius = math.clamp(Config.Radius or 4, 0, 10)
 
-		local StrokeColor, StrokeThemeTag
-		if not IsTransparent then
-			if UseTheme then
-				StrokeColor = Creator.GetThemeProperty("DialogButtonBorder")
-				StrokeThemeTag = { Color = "DialogButtonBorder" }
-			else
-				StrokeColor = TextColor or (not IsGradient and BgColor) or Color3.fromRGB(255, 255, 255)
-				StrokeThemeTag = nil
-			end
-		end
+
 
 		local Children = {
 			New("UICorner", {
@@ -303,17 +293,7 @@ return function(Config)
 			}))
 		end
 
-		local IconColor, IconThemeTag
-		if TextColor then
-			IconColor = TextColor
-			IconThemeTag = nil
-		elseif UseTheme then
-			IconColor = Creator.GetThemeProperty("Accent")
-			IconThemeTag = { ImageColor3 = "Accent" }
-		else
-			IconColor = Color3.fromRGB(255, 255, 255)
-			IconThemeTag = nil
-		end
+
 
 		-- Only show icon if not transparent, or if explicitly requested to show on transparent
 		if Config.Icon and (not IsTransparent or Config.ShowIconOnTransparent) then
@@ -522,13 +502,7 @@ return function(Config)
 					end
 				end
 
-				local UIStroke = TagFrame:FindFirstChildOfClass("UIStroke")
-				if UIStroke then
-					UIStroke.Color = StrokeColor
-					if Creator.Registry[UIStroke] then
-						Creator.Registry[UIStroke].Properties.Color = nil
-					end
-				end
+
 
 				if Creator.Registry[TagFrame] then
 					Creator.Registry[TagFrame].Properties.BackgroundColor3 = nil
