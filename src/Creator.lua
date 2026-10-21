@@ -89,7 +89,8 @@ function Creator.CreateRipple(Button)
 			ZIndex = 100,
 		})
 		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = Overlay })
-		Creator.AddThemeObject(Overlay, { BackgroundColor3 = "Hover" })
+		-- Short-lived, so not registered for theme updates (the registry would keep it forever)
+		Overlay.BackgroundColor3 = Creator.GetThemeProperty("Hover")
 
 		local Tween = TweenService:Create(Overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			BackgroundTransparency = 1
@@ -201,7 +202,7 @@ function Creator.New(Name, Properties, Children)
 
 	-- Properties
 	for Name, Value in next, Properties or {} do
-		if Name ~= "ThemeTag" then
+		if Name ~= "ThemeTag" and Name ~= "Parent" then
 			Object[Name] = Value
 		end
 	end
@@ -212,6 +213,11 @@ function Creator.New(Name, Properties, Children)
 	end
 
 	ApplyCustomProps(Object, Properties)
+
+	-- Parent last so the object is fully built before entering the live tree
+	if Properties and Properties.Parent then
+		Object.Parent = Properties.Parent
+	end
 	return Object
 end
 
@@ -235,7 +241,7 @@ function Creator.SpringMotor(Initial, Instance, Prop, IgnoreDialogCheck, ResetOn
 		end)
 	end
 
-	local function SetValue(Value, Ignore)
+	local function SetValue(Value, Ignore, Instant)
 		Ignore = Ignore or false
 		if not IgnoreDialogCheck then
 			if not Ignore then
@@ -244,6 +250,15 @@ function Creator.SpringMotor(Initial, Instance, Prop, IgnoreDialogCheck, ResetOn
 				end
 			end
 		end
+
+		-- Snap without animating: avoids a RenderStepped connection for off-screen objects
+		if Instant then
+			Motor:stop()
+			Motor._state = { complete = true, value = Value }
+			Instance[Prop] = Value
+			return
+		end
+
 		Motor:setGoal(Flipper.Spring.new(Value, { frequency = 8 }))
 	end
 

@@ -30,11 +30,58 @@ local IconModule = {
 	Icons = {},
 }
 
+local CacheFolder = "TluentIcons"
+local CanCache = writefile and readfile and isfile and isfolder and makefolder
+
+local function CachePath(packName)
+	return CacheFolder .. "/" .. packName .. ".lua"
+end
+
+local function WriteCache(packName, source)
+	if not CanCache then
+		return
+	end
+	pcall(function()
+		if not isfolder(CacheFolder) then
+			makefolder(CacheFolder)
+		end
+		writefile(CachePath(packName), source)
+	end)
+end
+
+-- Cached copy on disk, or nil when missing/corrupted
+local function LoadCached(packName)
+	if not CanCache then
+		return nil
+	end
+	local ok, pack = pcall(function()
+		local path = CachePath(packName)
+		if isfile(path) then
+			return loadstring(readfile(path))()
+		end
+	end)
+	return ok and type(pack) == "table" and pack or nil
+end
+
 function IconModule.GetIconPack(packName)
 	if not IconModule.Icons[packName] then
 		local url = IconModule.IconURLs[packName]
 		if url then
-			IconModule.Icons[packName] = loadstring(Get(url))()
+			-- Serve from the disk cache to avoid a blocking download, refreshing it in the background
+			local cached = LoadCached(packName)
+			if cached then
+				IconModule.Icons[packName] = cached
+				task.spawn(function()
+					local ok, source = pcall(Get, url)
+					if ok and type(source) == "string" and loadstring(source) then
+						WriteCache(packName, source)
+					end
+				end)
+			else
+				local source = Get(url)
+				IconModule.Icons[packName] = loadstring(source)()
+				WriteCache(packName, source)
+			end
 		end
 	end
 	return IconModule.Icons[packName]

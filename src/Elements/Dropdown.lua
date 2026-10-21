@@ -222,6 +222,8 @@ function Element:New(Idx, Config)
 	end
 
 	local ListSizeX = 0
+	local ListWidthDirty = true
+	local BuiltCount = 0
 	local VisibleCount = #Dropdown.Values
 	local SearchHeightOffset = SearchEnabled and 40 or 0
 
@@ -235,6 +237,27 @@ function Element:New(Idx, Config)
 
 	local function RecalculateCanvasSize()
 		DropdownScrollFrame.CanvasSize = UDim2.fromOffset(0, DropdownListLayout.AbsoluteContentSize.Y)
+	end
+
+	-- Measuring TextBounds forces a text layout per label, so it's deferred until the list is opened
+	local function RecalculateListWidth()
+		if not ListWidthDirty then
+			return
+		end
+		ListWidthDirty = false
+
+		if BuiltCount > 0 then
+			local MaxLabelWidth = 0
+			for i = 1, BuiltCount do
+				local Width = Dropdown.ButtonPool[i].Label.TextBounds.X
+				if Width > MaxLabelWidth then
+					MaxLabelWidth = Width
+				end
+			end
+			ListSizeX = MaxLabelWidth + 30
+		end
+
+		RecalculateListSize()
 	end
 
 	RecalculateListPosition()
@@ -274,8 +297,16 @@ function Element:New(Idx, Config)
 		end)
 	end
 
+	-- Option buttons are only built when the list is first opened (or reopened after SetValues)
+	local ListDirty = true
+	local BuildList
+
 	local ScrollFrame = self.ScrollFrame
 	function Dropdown:Open()
+		if ListDirty then
+			BuildList()
+		end
+		RecalculateListWidth()
 		Dropdown.Opened = true
 		ScrollFrame.ScrollingEnabled = false
 		DropdownHolderCanvas.Visible = true
@@ -332,7 +363,9 @@ function Element:New(Idx, Config)
 		end
 	end
 
-	function Dropdown:BuildDropdownList()
+	function BuildList()
+		ListDirty = false
+
 		if not Dropdown.ButtonPool then
 			Dropdown.ButtonPool = {}
 		end
@@ -345,7 +378,6 @@ function Element:New(Idx, Config)
 		end
 
 		local Count = 0
-		local MaxLabelWidth = 0
 
 		for Idx, Value in next, Dropdown.Values do
 			local Table = {
@@ -466,29 +498,28 @@ function Element:New(Idx, Config)
 
 			Cache.Table = Table
 
-			if ButtonLabel.TextBounds.X > MaxLabelWidth then
-				MaxLabelWidth = ButtonLabel.TextBounds.X
-			end
-
 			function Table:UpdateButton()
 				local CurrentValue = Table.Value
+				-- Animate only when the list is visible; otherwise snap to skip spring motors
+				local Instant = not Dropdown.Opened
 				if Config.Multi then
 					Table.Selected = Dropdown.Value[CurrentValue]
-					Cache.SetBackTransparency(Table.Selected and 0.89 or 1)
+					Cache.SetBackTransparency(Table.Selected and 0.89 or 1, nil, Instant)
 				else
 					Table.Selected = Dropdown.Value == CurrentValue
-					Cache.SetBackTransparency(Table.Selected and 0.89 or 1)
+					Cache.SetBackTransparency(Table.Selected and 0.89 or 1, nil, Instant)
 				end
 
 				Creator.OverrideTag(Cache.Label, { TextColor3 = Table.Selected and "Accent" or "Text" })
-				Cache.SetSelTransparency(Table.Selected and 0 or 1)
+				Cache.SetSelTransparency(Table.Selected and 0 or 1, nil, Instant)
 			end
 
 			Table:UpdateButton()
-			Dropdown:Display()
 
 			Dropdown.Buttons[Button] = Table
 		end
+
+		Dropdown:Display()
 
 		if Dropdown.ButtonPool then
 			for i = Count + 1, #Dropdown.ButtonPool do
@@ -497,13 +528,24 @@ function Element:New(Idx, Config)
 		end
 
 		VisibleCount = Count
-
-		if Count > 0 then
-			ListSizeX = MaxLabelWidth + 30
-		end
+		BuiltCount = Count
+		ListWidthDirty = true
 
 		RecalculateCanvasSize()
 		RecalculateListSize()
+
+		if Dropdown.Opened then
+			RecalculateListWidth()
+		end
+	end
+
+	function Dropdown:BuildDropdownList()
+		if Dropdown.Opened then
+			BuildList()
+		else
+			ListDirty = true
+			Dropdown:Display()
+		end
 	end
 
 	function Dropdown:ApplySearch()
@@ -571,9 +613,14 @@ function Element:New(Idx, Config)
 	function Dropdown:SetValue(Val)
 		if Dropdown.Multi then
 			local nTable = {}
+			local ValueSet = {}
+
+			for _, Value in next, Dropdown.Values do
+				ValueSet[Value] = true
+			end
 
 			for Value, Bool in next, Val do
-				if table.find(Dropdown.Values, Value) then
+				if ValueSet[Value] then
 					nTable[Value] = true
 				end
 			end

@@ -10,6 +10,8 @@ local SaveManager = {} do
 	SaveManager._initialized = false
 	SaveManager._hookedOptions = {}
 	SaveManager._autoSaveTimer = nil
+	-- Max seconds of work per frame while loading a config before yielding
+	SaveManager.LoadFrameBudget = 0.005
 	SaveManager.Parser = {
 		Toggle = {
 			Save = function(idx, object) 
@@ -115,6 +117,28 @@ local SaveManager = {} do
 		return true
 	end
 
+	local function sameValue(a, b)
+		if type(a) ~= "table" or type(b) ~= "table" then
+			return a == b
+		end
+		for k, v in next, a do
+			if not sameValue(v, b[k]) then return false end
+		end
+		for k in next, b do
+			if a[k] == nil then return false end
+		end
+		return true
+	end
+
+	-- Skips options whose saved data matches their current state, so their callbacks don't re-run
+	function SaveManager:_IsUnchanged(parser, data)
+		local object = self.Options[data.idx]
+		if not object then return false end
+
+		local success, current = pcall(parser.Save, data.idx, object)
+		return success and sameValue(current, data)
+	end
+
 	function SaveManager:Load(name)
 		if (not name) then
 			return false, "no config file is selected"
@@ -131,9 +155,18 @@ local SaveManager = {} do
 			return false, "decode error"
 		end
 
+		local frameStart = os.clock()
 		for _, option in next, decoded.objects do
-			if self.Parser[option.type] and not self.Ignore[option.idx] then
-				pcall(self.Parser[option.type].Load, option.idx, option)
+			local parser = self.Parser[option.type]
+			if parser and not self.Ignore[option.idx] and not self:_IsUnchanged(parser, option) then
+				-- Spawned so a yielding user callback doesn't stall the rest of the load
+				task.spawn(pcall, parser.Load, option.idx, option)
+
+				-- Spread the work across frames instead of freezing the UI
+				if os.clock() - frameStart > self.LoadFrameBudget then
+					task.wait()
+					frameStart = os.clock()
+				end
 			end
 		end
 
