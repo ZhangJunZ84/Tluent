@@ -374,7 +374,7 @@ return function(Config)
 		local MINIMIZE_GUI_NAME = "zM_GUI"
 		local MINIMIZE_BUTTON_NAME = "zM_BTN"
 
-		local MinButtonImage = Config.MinimizeButtonImage or "rbxassetid://72031513619068"
+		local MinButtonImage = Config.MinimizeButtonImage or "rbxassetid://114275042403258"
 		local MinButtonSize = Config.MinimizeButtonSize or 50
 
 		-- Create or reuse the ScreenGui
