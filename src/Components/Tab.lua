@@ -70,17 +70,6 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 	Glyph.AnchorPoint = Vector2.new(0.5, 0.5)
 	Glyph.Position = UDim2.fromScale(0.5, 0.5)
 
-	-- Accent edge against the rail's divider
-	local Indicator = New("Frame", {
-		Size = UDim2.new(0, 2, 1, 0),
-		Position = UDim2.new(1, -2, 0, 0),
-		BorderSizePixel = 0,
-		Visible = false,
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
-	})
-
 	Tab.Frame = New("TextButton", {
 		Size = Tab.Pinned and UDim2.fromScale(1, 1) or UDim2.new(1, 0, 0, 52),
 		BackgroundTransparency = 1,
@@ -94,7 +83,6 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		},
 	}, {
 		Glyph,
-		Indicator,
 	})
 
 	if not Tab.Pinned then
@@ -124,7 +112,6 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 	function Tab.SetSelected(Selected)
 		Tab.Selected = Selected
 		Tab.Frame.BackgroundTransparency = Selected and 0 or 1
-		Indicator.Visible = Selected
 		SetForeground(Selected and "Text" or "Soft")
 	end
 
@@ -166,14 +153,12 @@ function TabModule:New(Title, Icon, Parent, TabConfig)
 		},
 	}, {
 		ContainerLayout,
-		New("UIPadding", {
-			PaddingBottom = UDim.new(0, 16),
-		}),
 	})
 	Tab.ContainerFrame:SetAttribute("Card", true)
 
 	Creator.AddSignal(ContainerLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-		Tab.ContainerFrame.CanvasSize = UDim2.new(0, 0, 0, ContainerLayout.AbsoluteContentSize.Y + 17)
+		-- +1 keeps the last row's hairline, which sits just below the content
+		Tab.ContainerFrame.CanvasSize = UDim2.new(0, 0, 0, ContainerLayout.AbsoluteContentSize.Y + 1)
 	end)
 
 	TabModule.Containers[TabIndex] = Tab.ContainerFrame

@@ -612,6 +612,10 @@ return function(Config)
 
 	local TabModule = require(Components.Tab):Init(Window)
 	function Window:AddTab(TabConfig)
+		-- A Settings tab goes to the footer cell unless the script says Pinned = false
+		if TabConfig.Pinned == nil and TabConfig.Title == "Settings" then
+			TabConfig.Pinned = true
+		end
 		local Parent = TabConfig.Pinned and Window.PinnedHolder or Window.TabHolder
 		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Parent, TabConfig)
 		if TabConfig.Badge then

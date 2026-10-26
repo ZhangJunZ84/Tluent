@@ -4,14 +4,14 @@ return {
 	Accent = Color3.fromHex("#00dc6e"),
 
 	Background = Color3.fromHex("#07140f"),
-	Surface = Color3.fromHex("#0e1b16"),
-	Surface2 = Color3.fromHex("#14221c"),
-	Surface3 = Color3.fromHex("#1b2823"),
+	Surface = Color3.fromHex("#0f1c17"),
+	Surface2 = Color3.fromHex("#17241f"),
+	Surface3 = Color3.fromHex("#222f2a"),
 
-	Line = Color3.fromHex("#182520"),
-	Line2 = Color3.fromHex("#24312c"),
+	Line = Color3.fromHex("#202d28"),
+	Line2 = Color3.fromHex("#2f3c37"),
 
 	Text = Color3.fromHex("#e7f5ee"),
-	Muted = Color3.fromHex("#99a6a0"),
-	Soft = Color3.fromHex("#6c7973"),
+	Muted = Color3.fromHex("#9fada7"),
+	Soft = Color3.fromHex("#77847e"),
 }

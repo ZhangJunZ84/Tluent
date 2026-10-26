@@ -34,12 +34,14 @@ local Tabs = {
 local Options = Fluent.Options
 
 do
-    -- Tags without a Color use the theme: a square neutral chip with the icon in the accent.
-    -- Pass Color (a Color3 or a ColorSequence) for a filled tag, or change it later with Tag:SetColor
+    -- Style = "Version" gives the version its own chip: a breathing accent dot and a light sweep
     Window:Tag({
-        Title = Fluent.Version,
-        Icon = "info",
+        Title = "v" .. Fluent.Version,
+        Style = "Version",
     })
+
+    -- Other tags without a Color use the theme: a square neutral chip with the icon in the accent.
+    -- Pass Color (a Color3 or a ColorSequence) for a filled tag, or change it later with Tag:SetColor
 
     Window:Tag({
         Title = "TWVZ",

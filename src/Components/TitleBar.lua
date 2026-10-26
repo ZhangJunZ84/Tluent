@@ -1,3 +1,4 @@
+local TweenService = game:GetService("TweenService")
 local Root = script.Parent.Parent
 local Creator = require(Root.Creator)
 local Icons = require(Root.Icons)
@@ -88,7 +89,13 @@ return function(Config)
 		},
 	})
 
-	-- Logo cell above the rail: the logo image, a small brand lockup, or the title's initial
+	-- Logo cell above the rail: the logo image, a small brand lockup (TWVZ unless Brand says
+	-- otherwise), or the title's initial with Brand = false
+	local Brand = Config.Brand
+	if Brand == nil then
+		Brand = "TWVZ"
+	end
+
 	local Mark
 	if Config.Logo then
 		Mark = New("ImageLabel", {
@@ -100,9 +107,9 @@ return function(Config)
 				ImageColor3 = "Text",
 			},
 		})
-	elseif Config.Brand then
+	elseif Brand then
 		local Wordmark = New("TextLabel", {
-			Text = Config.Brand,
+			Text = Brand,
 			FontFace = Creator.Fonts.Bold,
 			TextSize = 12,
 			Size = UDim2.fromOffset(0, 11),
@@ -291,8 +298,104 @@ return function(Config)
 		Library.Window:Minimize()
 	end)
 
+	-- Style = "Version": a live-looking chip, an accent dot that breathes and a band of accent
+	-- light that crosses the text every few seconds
+	local function VersionTag(Parent, Config)
+		local Dot = New("Frame", {
+			Size = UDim2.fromOffset(6, 6),
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "Accent",
+			},
+		})
+
+		local Sweep = New("UIGradient", {
+			Offset = Vector2.new(-1, 0),
+		})
+		Creator.AddThemeObject(Sweep, {
+			Color = function(GetTheme)
+				local Text, Accent = GetTheme("Text"), GetTheme("Accent")
+				Sweep.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, Text),
+					ColorSequenceKeypoint.new(0.4, Text),
+					ColorSequenceKeypoint.new(0.5, Accent),
+					ColorSequenceKeypoint.new(0.6, Text),
+					ColorSequenceKeypoint.new(1, Text),
+				})
+			end,
+		})
+
+		local Label = New("TextLabel", {
+			Text = Config.Title or "",
+			FontFace = Creator.Fonts.Mono,
+			TextSize = 12,
+			TextColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+		}, {
+			Sweep,
+		})
+
+		local TagFrame = New("Frame", {
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			Parent = Parent,
+			ThemeTag = {
+				BackgroundColor3 = "Surface",
+			},
+		}, {
+			New("UIPadding", {
+				PaddingLeft = UDim.new(0, 7),
+				PaddingRight = UDim.new(0, 7),
+				PaddingTop = UDim.new(0, 3),
+				PaddingBottom = UDim.new(0, 3),
+			}),
+			New("UIListLayout", {
+				Padding = UDim.new(0, 6),
+				FillDirection = Enum.FillDirection.Horizontal,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+			}),
+			New("UIStroke", {
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				ThemeTag = {
+					Color = "AccentLine",
+				},
+			}),
+			Dot,
+			Label,
+		})
+
+		TweenService:Create(Dot, TweenInfo.new(1.4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {
+			BackgroundTransparency = 0.75,
+		}):Play()
+		TweenService:Create(Sweep, TweenInfo.new(1.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, false, 4), {
+			Offset = Vector2.new(1, 0),
+		}):Play()
+
+		local Tag = {
+			Frame = TagFrame,
+		}
+
+		function Tag:Destroy()
+			TagFrame:Destroy()
+		end
+
+		function Tag:SetTitle(Text)
+			Label.Text = Text
+		end
+
+		-- Kept for API parity; the version style always follows the theme
+		function Tag:SetColor() end
+
+		return Tag
+	end
+
 	function TitleBar:AddTag(Config)
 		Config = Config or {}
+		if Config.Style == "Version" then
+			return VersionTag(self.TagsFrame, Config)
+		end
 
 		local BgColor = Config.Color
 		local TextColor = Config.TextColor
