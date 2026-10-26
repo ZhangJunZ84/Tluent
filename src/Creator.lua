@@ -76,6 +76,75 @@ Creator.Typography = {
 	Body = { Font = Enum.Font.Roboto, Size = 14 },
 }
 
+-- Geist (the TWVZ brand font) as a custom font family: the TTFs are downloaded once into the
+-- executor workspace and exposed through getcustomasset. Returns nil when that isn't possible.
+local FontFolder = "TluentFonts"
+local FontSource = "https://cdn.jsdelivr.net/fontsource/fonts/%s@latest/latin-%d-normal.ttf"
+
+local function LoadFontFamily(Name, Package, Weights)
+	if not (writefile and readfile and isfile and isfolder and makefolder and getcustomasset) then
+		return nil
+	end
+
+	local Success, Family = pcall(function()
+		if not isfolder(FontFolder) then
+			makefolder(FontFolder)
+		end
+
+		local Faces = {}
+		for _, Weight in ipairs(Weights) do
+			local Path = string.format("%s/%s-%d.ttf", FontFolder, Name, Weight)
+			if not isfile(Path) then
+				local Data = game:HttpGet(string.format(FontSource, Package, Weight))
+				assert(#Data > 1024, "font download failed")
+				writefile(Path, Data)
+			end
+			table.insert(Faces, {
+				name = tostring(Weight),
+				weight = Weight,
+				style = "normal",
+				assetId = getcustomasset(Path),
+			})
+		end
+
+		local JsonPath = string.format("%s/%s.json", FontFolder, Name)
+		writefile(JsonPath, game:GetService("HttpService"):JSONEncode({ name = Name, faces = Faces }))
+		return getcustomasset(JsonPath)
+	end)
+
+	return Success and Family or nil
+end
+
+-- One monospace family for every text in the library. getgenv().TluentFont picks another
+-- before the library loads.
+local MonoFonts = {
+	["martian-mono"] = { "MartianMono", { 400, 500, 600, 700 } },
+	["geist-mono"] = { "GeistMono", { 400, 500, 600, 700 } },
+	["jetbrains-mono"] = { "JetBrainsMono", { 400, 500, 600, 700 } },
+	["space-mono"] = { "SpaceMono", { 400, 700 } },
+}
+local MonoPackage = getgenv and getgenv().TluentFont
+if not MonoFonts[MonoPackage] then
+	MonoPackage = "martian-mono"
+end
+
+local MonoFamily = LoadFontFamily(MonoFonts[MonoPackage][1], MonoPackage, MonoFonts[MonoPackage][2])
+	or "rbxasset://fonts/families/RobotoMono.json"
+
+Creator.Fonts = {
+	Regular = Font.new(MonoFamily, Enum.FontWeight.Regular),
+	Medium = Font.new(MonoFamily, Enum.FontWeight.Medium),
+	SemiBold = Font.new(MonoFamily, Enum.FontWeight.SemiBold),
+	Bold = Font.new(MonoFamily, Enum.FontWeight.Bold),
+	Mono = Font.new(MonoFamily, Enum.FontWeight.Medium),
+}
+
+-- Text created without an explicit FontFace falls back to the family too
+for _, Class in next, { "TextLabel", "TextButton", "TextBox" } do
+	Creator.DefaultProperties[Class].Font = nil
+	Creator.DefaultProperties[Class].FontFace = Creator.Fonts.Regular
+end
+
 function Creator.CreateRipple(Button)
 	Creator.AddSignal(Button.MouseButton1Down, function()
 		local parentCorner = Button:FindFirstChildOfClass("UICorner")
@@ -90,7 +159,7 @@ function Creator.CreateRipple(Button)
 		})
 		Creator.New("UICorner", { CornerRadius = cornerRadius, Parent = Overlay })
 		-- Short-lived, so not registered for theme updates (the registry would keep it forever)
-		Overlay.BackgroundColor3 = Creator.GetThemeProperty("Hover")
+		Overlay.BackgroundColor3 = Creator.GetThemeProperty("Text")
 
 		local Tween = TweenService:Create(Overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			BackgroundTransparency = 1
@@ -124,24 +193,51 @@ function Creator.Disconnect()
 	end
 end
 
+-- Themes only define the palette (Accent, Background, Surface..3, Line, Line2, Text, Muted, Soft);
+-- everything else is derived from it here
+local Derived = {}
+
+local function Token(Theme, Property)
+	local Value = Theme[Property]
+	if Value == nil and Derived[Property] then
+		return Derived[Property](Theme)
+	end
+	return Value
+end
+
+function Derived.BrandFrame(Theme)
+	return Theme.Muted:Lerp(Theme.Soft, 0.4)
+end
+
+function Derived.Danger()
+	return Color3.fromHex("#f87171")
+end
+
+-- Text on accent fills: dark on light accents, white on dark ones
+function Derived.AccentInk(Theme)
+	local Accent = Theme.Accent
+	local Luminance = 0.299 * Accent.R + 0.587 * Accent.G + 0.114 * Accent.B
+	return Luminance > 0.55 and Color3.fromHex("#0b0c0e") or Color3.new(1, 1, 1)
+end
+
+function Derived.AccentLine(Theme)
+	return Theme.Background:Lerp(Theme.Accent, 0.45)
+end
+
+function Derived.ActiveRow(Theme)
+	return Theme.Surface2:Lerp(Theme.Accent, 0.06)
+end
+
 function Creator.GetThemeProperty(Property)
-	local ThemeTable = Themes[require(Root).Theme] or Themes["Dark"]
-	if ThemeTable[Property] then
-		return ThemeTable[Property]
+	local Library = require(Root)
+	local Theme = Themes[Library.Theme] or Themes.TWVZ
+
+	-- A per-script accent (Window Accent / Library:SetAccent) wins over the theme's
+	if Library.AccentColor then
+		Theme = setmetatable({ Accent = Library.AccentColor }, { __index = Theme })
 	end
 
-	-- Fallbacks for new structural properties in case older themes do not define them
-	if Property == "SidebarBackground" then
-		return ThemeTable.DialogHolder or ThemeTable.AcrylicMain
-	elseif Property == "ContentBackground" then
-		return ThemeTable.AcrylicMain or ThemeTable.Dialog
-	elseif Property == "SelectedTabBackground" then
-		return ThemeTable.Dialog
-	elseif Property == "SelectedTabText" then
-		return ThemeTable.Accent or ThemeTable.Text
-	end
-
-	return Themes["Dark"][Property]
+	return Token(Theme, Property)
 end
 
 function Creator.UpdateTheme()
@@ -153,10 +249,6 @@ function Creator.UpdateTheme()
 				Instance[Property] = Creator.GetThemeProperty(ColorIdx)
 			end
 		end
-	end
-
-	for _, Motor in next, Creator.TransparencyMotors do
-		Motor:setGoal(Flipper.Instant.new(Creator.GetThemeProperty("ElementTransparency")))
 	end
 end
 

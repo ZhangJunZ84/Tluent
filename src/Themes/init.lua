@@ -1,5 +1,6 @@
 local Themes = {
 	Names = {
+		"TWVZ",
 		"Dark",
 		"Darker",
 		"Light",

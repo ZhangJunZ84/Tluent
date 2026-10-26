@@ -7,9 +7,9 @@ return function(Parent, DialogCheck)
 	local Button = {}
 
 	Button.Title = New("TextLabel", {
-		FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+		FontFace = Creator.Fonts.SemiBold,
 		TextColor3 = Color3.fromRGB(200, 200, 200),
-		TextSize = 16,
+		TextSize = 14,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
@@ -26,11 +26,11 @@ return function(Parent, DialogCheck)
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			BackgroundColor3 = "Hover",
+			BackgroundColor3 = "Text",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 4),
+			CornerRadius = UDim.new(0, 0),
 		}),
 	})
 
@@ -38,17 +38,16 @@ return function(Parent, DialogCheck)
 		Size = UDim2.new(0, 0, 0, 32),
 		Parent = Parent,
 		ThemeTag = {
-			BackgroundColor3 = "DialogButton",
+			BackgroundColor3 = "Surface2",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 4),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIStroke", {
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-			Transparency = 0.65,
 			ThemeTag = {
-				Color = "DialogButtonBorder",
+				Color = "Line2",
 			},
 		}),
 		Button.HoverFrame,

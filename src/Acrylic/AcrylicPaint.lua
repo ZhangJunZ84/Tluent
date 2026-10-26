@@ -8,10 +8,10 @@ return function()
 
 	AcrylicPaint.Frame = New("Frame", {
 		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 0.9,
-		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 	}, {
+		-- Drop shadow
 		New("ImageLabel", {
 			Image = "rbxassetid://8992230677",
 			ScaleType = "Slice",
@@ -21,69 +21,36 @@ return function()
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			BackgroundTransparency = 1,
 			ImageColor3 = Color3.fromRGB(0, 0, 0),
-			ImageTransparency = 0.7,
-		}),
-
-		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			ImageTransparency = 0.55,
 		}),
 
 		New("Frame", {
-			BackgroundTransparency = 0.45,
+			BackgroundTransparency = 0,
 			Size = UDim2.fromScale(1, 1),
 			Name = "Background",
 			ThemeTag = {
-				BackgroundColor3 = "AcrylicMain",
+				BackgroundColor3 = "Background",
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 		}),
 
+		-- Faint accent wash fading down from the top edge
 		New("Frame", {
-			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-			BackgroundTransparency = 0.4,
-			Size = UDim2.fromScale(1, 1),
+			BackgroundTransparency = 0,
+			Size = UDim2.new(1, 0, 0, 140),
+			ThemeTag = {
+				BackgroundColor3 = "Accent",
+			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
-
 			New("UIGradient", {
 				Rotation = 90,
-				ThemeTag = {
-					Color = "AcrylicGradient",
-				},
-			}),
-		}),
-
-		New("ImageLabel", {
-			Image = "rbxassetid://9968344105",
-			ImageTransparency = 0.98,
-			ScaleType = Enum.ScaleType.Tile,
-			TileSize = UDim2.new(0, 128, 0, 128),
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
-			}),
-		}),
-
-		New("ImageLabel", {
-			Image = "rbxassetid://9968344227",
-			ImageTransparency = 0.9,
-			ScaleType = Enum.ScaleType.Tile,
-			TileSize = UDim2.new(0, 128, 0, 128),
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			ThemeTag = {
-				ImageTransparency = "AcrylicNoise",
-			},
-		}, {
-			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				Transparency = NumberSequence.new(0.93, 1),
 			}),
 		}),
 
@@ -93,13 +60,12 @@ return function()
 			ZIndex = 2,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			New("UIStroke", {
-				Transparency = 0.5,
 				Thickness = 1,
 				ThemeTag = {
-					Color = "AcrylicBorder",
+					Color = "AccentLine",
 				},
 			}),
 		}),

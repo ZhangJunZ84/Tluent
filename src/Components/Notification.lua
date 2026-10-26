@@ -11,8 +11,8 @@ local Notification = {}
 
 function Notification:Init(GUI)
 	Notification.Holder = New("Frame", {
-		Position = UDim2.new(1, -30, 1, -30),
-		Size = UDim2.new(0, 310, 1, -30),
+		Position = UDim2.new(1, -20, 1, -20),
+		Size = UDim2.new(0, 300, 1, -20),
 		AnchorPoint = Vector2.new(1, 1),
 		BackgroundTransparency = 1,
 		Parent = GUI,
@@ -21,7 +21,7 @@ function Notification:Init(GUI)
 			HorizontalAlignment = Enum.HorizontalAlignment.Center,
 			SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Bottom,
-			Padding = UDim.new(0, 20),
+			Padding = UDim.new(0, 8),
 		}),
 	})
 end
@@ -37,16 +37,16 @@ function Notification:New(Config)
 	}
 
 	NewNotification.Title = New("TextLabel", {
-		Position = UDim2.new(0, 14, 0, 17),
+		Position = UDim2.new(0, 30, 0, 17),
 		Text = Config.Title,
 		RichText = true,
 		TextColor3 = Color3.fromRGB(255, 255, 255),
 		TextTransparency = 0,
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold),
-		TextSize = 15,
+		FontFace = Creator.Fonts.SemiBold,
+		TextSize = 14,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
-		Size = UDim2.new(1, -12, 0, 12),
+		Size = UDim2.new(1, -70, 0, 12),
 		TextWrapped = true,
 		BackgroundTransparency = 1,
 		ThemeTag = {
@@ -55,10 +55,10 @@ function Notification:New(Config)
 	})
 
 	NewNotification.ContentLabel = New("TextLabel", {
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
+		FontFace = Creator.Fonts.Medium,
 		Text = Config.Content,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 14,
+		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 14),
@@ -66,15 +66,15 @@ function Notification:New(Config)
 		BackgroundTransparency = 1,
 		TextWrapped = true,
 		ThemeTag = {
-			TextColor3 = "Text",
+			TextColor3 = "Muted",
 		},
 	})
 
 	NewNotification.SubContentLabel = New("TextLabel", {
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
+		FontFace = Creator.Fonts.Regular,
 		Text = Config.SubContent,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 14,
+		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		AutomaticSize = Enum.AutomaticSize.Y,
 		Size = UDim2.new(1, 0, 0, 14),
@@ -82,7 +82,7 @@ function Notification:New(Config)
 		BackgroundTransparency = 1,
 		TextWrapped = true,
 		ThemeTag = {
-			TextColor3 = "SubText",
+			TextColor3 = "Soft",
 		},
 	})
 
@@ -90,8 +90,8 @@ function Notification:New(Config)
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(14, 40),
-		Size = UDim2.new(1, -28, 0, 0),
+		Position = UDim2.fromOffset(30, 36),
+		Size = UDim2.new(1, -44, 0, 0),
 	}, {
 		New("UIListLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
@@ -113,7 +113,7 @@ function Notification:New(Config)
 			local CloseIcon = Icons.Image({
 				Icon = "lucide:x",
 				Size = UDim2.fromOffset(16, 16),
-				Colors = { "Text" },
+				Colors = { "Soft" },
 			})
 			CloseIcon.IconFrame.Position = UDim2.fromScale(0.5, 0.5)
 			CloseIcon.IconFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -126,17 +126,25 @@ function Notification:New(Config)
 		Size = UDim2.new(1, 0, 1, 0),
 		Position = UDim2.fromScale(1, 0),
 		ThemeTag = {
-			BackgroundColor3 = "Dialog",
+			BackgroundColor3 = "Surface2",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIStroke", {
-			Transparency = 0.5,
 			ThemeTag = {
-				Color = "DialogBorder",
+				Color = "Line2",
 			},
+		}),
+		New("Frame", {
+			Size = UDim2.fromOffset(8, 8),
+			Position = UDim2.fromOffset(14, 21),
+			ThemeTag = {
+				BackgroundColor3 = "Accent",
+			},
+		}, {
+			New("UICorner", { CornerRadius = UDim.new(0, 0) }),
 		}),
 		NewNotification.Title,
 		NewNotification.CloseButton,
@@ -160,16 +168,16 @@ function Notification:New(Config)
 	})
 
 	local ProgressTrack = New("Frame", {
-		Size = UDim2.new(1, -28, 0, 4),
-		Position = UDim2.new(0, 14, 1, -12),
+		Size = UDim2.new(1, -28, 0, 2),
+		Position = UDim2.new(0, 14, 1, -8),
 		BorderSizePixel = 0,
-		BackgroundTransparency = 0.8,
+		BackgroundTransparency = 0.85,
 		Parent = NewNotification.Root,
 		ThemeTag = {
 			BackgroundColor3 = "Accent",
 		},
 	}, {
-		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+		New("UICorner", { CornerRadius = UDim.new(0, 0) }),
 	})
 
 	local ProgressBar = New("Frame", {
@@ -180,7 +188,7 @@ function Notification:New(Config)
 			BackgroundColor3 = "Accent",
 		},
 	}, {
-		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+		New("UICorner", { CornerRadius = UDim.new(0, 0) }),
 	})
 
 	local RootMotor = Flipper.GroupMotor.new({
@@ -198,7 +206,7 @@ function Notification:New(Config)
 
 	function NewNotification:Open()
 		local ContentSize = NewNotification.LabelHolder.AbsoluteSize.Y
-		NewNotification.Holder.Size = UDim2.new(1, 0, 0, 64 + ContentSize)
+		NewNotification.Holder.Size = UDim2.new(1, 0, 0, 56 + ContentSize)
 
 		RootMotor:setGoal({
 			Scale = Spring(0, { frequency = 5 }),

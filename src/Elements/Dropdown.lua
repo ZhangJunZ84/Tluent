@@ -37,13 +37,13 @@ function Element:New(Idx, Config)
 	Dropdown.SetDesc = DropdownFrame.SetDesc
 
 	local DropdownDisplay = New("TextLabel", {
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+		FontFace = Creator.Fonts.Medium,
 		Text = "Value",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 15,
+		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
-		Size = UDim2.new(1, -30, 0, 14),
-		Position = UDim2.new(0, 8, 0.5, 0),
+		Size = UDim2.new(1, -34, 0, 15),
+		Position = UDim2.new(0, 10, 0.5, 0),
 		AnchorPoint = Vector2.new(0, 0.5),
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,
@@ -60,7 +60,7 @@ function Element:New(Idx, Config)
 		Position = UDim2.new(1, -8, 0.5, 0),
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			ImageColor3 = "SubText",
+			ImageColor3 = "Soft",
 		},
 	})
 
@@ -68,20 +68,19 @@ function Element:New(Idx, Config)
 		Size = UDim2.fromOffset(160, 30),
 		Position = UDim2.new(1, -10, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		BackgroundTransparency = 0.9,
+		BackgroundTransparency = 0,
 		Parent = DropdownFrame.Frame,
 		ThemeTag = {
-			BackgroundColor3 = "DropdownFrame",
+			BackgroundColor3 = "Background",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIStroke", {
-			Transparency = 0.5,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 			ThemeTag = {
-				Color = "InElementBorder",
+				Color = "Line2",
 			},
 		}),
 		DropdownIco,
@@ -111,17 +110,17 @@ function Element:New(Idx, Config)
 	local DropdownHolderFrame = New("Frame", {
 		Size = UDim2.fromScale(1, 0.6),
 		ThemeTag = {
-			BackgroundColor3 = "DropdownHolder",
+			BackgroundColor3 = "Surface2",
 		},
 	}, {
 		DropdownScrollFrame,
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIStroke", {
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 			ThemeTag = {
-				Color = "DropdownBorder",
+				Color = "Line2",
 			},
 		}),
 		New("ImageLabel", {
@@ -160,12 +159,12 @@ function Element:New(Idx, Config)
 			AnchorPoint = Vector2.new(0, 0.5),
 			BackgroundTransparency = 1,
 			ThemeTag = {
-				ImageColor3 = "SubText",
+				ImageColor3 = "Soft",
 			},
 		})
 
 		SearchBox = New("TextBox", {
-			FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+			FontFace = Creator.Fonts.Medium,
 			Text = "",
 			PlaceholderText = "Search...",
 			TextColor3 = Color3.fromRGB(200, 200, 200),
@@ -178,27 +177,27 @@ function Element:New(Idx, Config)
 			ClearTextOnFocus = false,
 			ThemeTag = {
 				TextColor3 = "Text",
-				PlaceholderColor3 = "SubText",
+				PlaceholderColor3 = "Soft",
 			},
 		})
 
 		SearchFrame = New("Frame", {
 			Size = UDim2.new(1, -10, 0, 30),
 			Position = UDim2.fromOffset(5, 5),
-			BackgroundTransparency = 0.9,
+			BackgroundTransparency = 0,
 			Parent = DropdownHolderFrame,
 			ThemeTag = {
-				BackgroundColor3 = "DropdownFrame",
+				BackgroundColor3 = "Background",
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			New("UIStroke", {
 				Transparency = 0.5,
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 				ThemeTag = {
-					Color = "InElementBorder",
+					Color = "Line2",
 				},
 			}),
 			SearchIcon,
@@ -411,7 +410,7 @@ function Element:New(Idx, Config)
 				ButtonSelector.AnchorPoint = Vector2.new(0, 0.5)
 
 				ButtonLabel = New("TextLabel", {
-					FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
+					FontFace = Creator.Fonts.Medium,
 					Text = Value,
 					TextColor3 = Color3.fromRGB(200, 200, 200),
 					TextSize = 15,
@@ -431,11 +430,11 @@ function Element:New(Idx, Config)
 					ZIndex = 23,
 					Text = "",
 					Parent = DropdownScrollFrame,
-					ThemeTag = { BackgroundColor3 = "DropdownOption" },
+					ThemeTag = { BackgroundColor3 = "Surface3" },
 				}, {
 					ButtonSelector,
 					ButtonLabel,
-					New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+					New("UICorner", { CornerRadius = UDim.new(0, 0) }),
 				})
 
 				local BackMotor, SetBackTransparency = Creator.SpringMotor(1, Button, "BackgroundTransparency")
@@ -574,14 +573,14 @@ function Element:New(Idx, Config)
 		if Count == 0 and SearchEnabled and Dropdown.SearchFilter ~= "" then
 			if not Dropdown.NoResultsLabel then
 				Dropdown.NoResultsLabel = New("TextLabel", {
-					FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.SemiBold),
+					FontFace = Creator.Fonts.Medium,
 					Text = "No results found",
 					TextColor3 = Color3.fromRGB(200, 200, 200),
 					TextSize = 15,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, -5, 0, 32),
 					ThemeTag = {
-						TextColor3 = "SubText",
+						TextColor3 = "Muted",
 					},
 				})
 			end

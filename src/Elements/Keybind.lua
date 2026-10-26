@@ -38,10 +38,10 @@ function Element:New(Idx, Config)
 	Keybind.SetDesc = KeybindFrame.SetDesc
 
 	local KeybindDisplayLabel = New("TextLabel", {
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+		FontFace = Creator.Fonts.Mono,
 		Text = Config.Default,
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 16,
+		TextSize = 12,
 		TextXAlignment = Enum.TextXAlignment.Center,
 		Size = UDim2.new(0, 0, 0, 14),
 		Position = UDim2.new(0, 0, 0.5, 0),
@@ -55,28 +55,27 @@ function Element:New(Idx, Config)
 	})
 
 	local KeybindDisplayFrame = New("TextButton", {
-		Size = UDim2.fromOffset(0, 30),
+		Size = UDim2.fromOffset(0, 24),
 		Position = UDim2.new(1, -10, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
-		BackgroundTransparency = 0.9,
+		BackgroundTransparency = 0,
 		Parent = KeybindFrame.Frame,
 		AutomaticSize = Enum.AutomaticSize.X,
 		ThemeTag = {
-			BackgroundColor3 = "Keybind",
+			BackgroundColor3 = "Surface3",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIPadding", {
 			PaddingLeft = UDim.new(0, 8),
 			PaddingRight = UDim.new(0, 8),
 		}),
 		New("UIStroke", {
-			Transparency = 0.5,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 			ThemeTag = {
-				Color = "InElementBorder",
+				Color = "Line2",
 			},
 		}),
 		KeybindDisplayLabel,

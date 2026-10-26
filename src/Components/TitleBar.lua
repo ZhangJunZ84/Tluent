@@ -24,47 +24,143 @@ return function(Config)
 
 	local Library = require(Root)
 
-	local SubTitleBelow = Config.SubTitlePosition == "Below"
-	local BarHeight = 40
+	local BarHeight = Config.Height or 52
+	local RailWidth = Config.RailWidth or 52
 
 	TitleBar.TitleLabel = New("TextLabel", {
 		RichText = true,
 		Text = Config.Title,
-		FontFace = Font.new(
-			"rbxassetid://12187372629",
-			Enum.FontWeight.Bold,
-			Enum.FontStyle.Normal
-		),
-		TextSize = Config.TitleSize or 17,
+		FontFace = Creator.Fonts.SemiBold,
+		TextSize = Config.TitleSize or 15,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
-		Size = SubTitleBelow and UDim2.new(0, 0, 0, 16) or UDim2.fromScale(0, 1),
-		AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
+		Size = UDim2.fromScale(0, 1),
+		AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 1,
+		LayoutOrder = 1,
 		ThemeTag = {
 			TextColor3 = "Text",
 		},
 	})
 
+	-- Lives in the window footer; the window reparents it
 	TitleBar.SubTitleLabel = New("TextLabel", {
 		RichText = true,
 		Text = Config.SubTitle,
-		TextTransparency = 0.4,
-		FontFace = Font.new(
-			"rbxassetid://12187372629",
-			Enum.FontWeight.SemiBold,
-			Enum.FontStyle.Normal
-		),
-		TextSize = SubTitleBelow and 13 or 15,
+		FontFace = Creator.Fonts.Mono,
+		TextSize = 12,
 		TextXAlignment = "Left",
 		TextYAlignment = "Center",
-		Size = SubTitleBelow and UDim2.new(0, 0, 0, 12) or UDim2.fromScale(0, 1),
-		AutomaticSize = SubTitleBelow and Enum.AutomaticSize.X or Enum.AutomaticSize.X,
+		Size = UDim2.fromScale(0, 1),
+		AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 1,
 		ThemeTag = {
-			TextColor3 = "Text",
+			TextColor3 = "Soft",
 		},
 	})
+
+	-- Breadcrumb with the selected tab, since the rail only shows icons
+	TitleBar.CrumbSeparator = New("TextLabel", {
+		Text = "/",
+		FontFace = Creator.Fonts.Regular,
+		TextSize = 15,
+		Size = UDim2.fromScale(0, 1),
+		AutomaticSize = Enum.AutomaticSize.X,
+		BackgroundTransparency = 1,
+		Visible = false,
+		LayoutOrder = 2,
+		ThemeTag = {
+			TextColor3 = "Line2",
+		},
+	})
+
+	TitleBar.CrumbLabel = New("TextLabel", {
+		Text = "",
+		FontFace = Creator.Fonts.Medium,
+		TextSize = 15,
+		Size = UDim2.fromScale(0, 1),
+		AutomaticSize = Enum.AutomaticSize.X,
+		BackgroundTransparency = 1,
+		Visible = false,
+		LayoutOrder = 3,
+		ThemeTag = {
+			TextColor3 = "Muted",
+		},
+	})
+
+	-- Logo cell above the rail: the logo image, a small brand lockup, or the title's initial
+	local Mark
+	if Config.Logo then
+		Mark = New("ImageLabel", {
+			Image = Config.Logo,
+			Size = UDim2.fromOffset(30, 30),
+			ScaleType = Enum.ScaleType.Fit,
+			BackgroundTransparency = 1,
+			ThemeTag = {
+				ImageColor3 = "Text",
+			},
+		})
+	elseif Config.Brand then
+		local Wordmark = New("TextLabel", {
+			Text = Config.Brand,
+			FontFace = Creator.Fonts.Bold,
+			TextSize = 12,
+			Size = UDim2.fromOffset(0, 11),
+			AutomaticSize = Enum.AutomaticSize.X,
+			BackgroundTransparency = 1,
+			ThemeTag = {
+				TextColor3 = "Text",
+			},
+		})
+
+		-- Parented to the wordmark so the frame's padding doesn't push it in; the offsets reach
+		-- out to the frame's bottom-left corner
+		New("Frame", {
+			Size = UDim2.new(0.34, 0, 0, 2),
+			Position = UDim2.new(0, -5, 1, 4),
+			AnchorPoint = Vector2.new(0, 1),
+			BorderSizePixel = 0,
+			ZIndex = 2,
+			Parent = Wordmark,
+			ThemeTag = {
+				BackgroundColor3 = "Accent",
+			},
+		})
+
+		Mark = New("Frame", {
+			Size = UDim2.fromScale(0, 0),
+			AutomaticSize = Enum.AutomaticSize.XY,
+			BackgroundTransparency = 1,
+		}, {
+			New("UIPadding", {
+				PaddingLeft = UDim.new(0, 4),
+				PaddingRight = UDim.new(0, 4),
+				PaddingTop = UDim.new(0, 3),
+				PaddingBottom = UDim.new(0, 3),
+			}),
+			New("UIStroke", {
+				Thickness = 1.5,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				ThemeTag = {
+					Color = "BrandFrame",
+				},
+			}),
+			Wordmark,
+		})
+	else
+		Mark = New("TextLabel", {
+			Text = string.upper(string.sub(Config.Title or "", 1, 1)),
+			FontFace = Creator.Fonts.Bold,
+			TextSize = 18,
+			Size = UDim2.fromOffset(20, 20),
+			BackgroundTransparency = 1,
+			ThemeTag = {
+				TextColor3 = "Text",
+			},
+		})
+	end
+	Mark.AnchorPoint = Vector2.new(0.5, 0.5)
+	Mark.Position = UDim2.fromScale(0.5, 0.5)
 
 	local function SetIconFrame(IconFrame, Icon)
 		local IconLabel = Icons.Icon2(Icon)
@@ -84,15 +180,16 @@ return function(Config)
 		end
 	end
 
-	local function BarButton(Icon, Pos, Parent, Callback, IsClose, IconSize)
+	-- Small ghost buttons: soft icon, surface fill on hover
+	local function BarButton(Icon, Index, Parent, Callback, IsClose, IconSize)
 		local Button = {
 			Callback = Callback or function() end,
 		}
 
 		local IconObject = Icons.Image({
 			Icon = Icon,
-			Size = UDim2.fromOffset(IconSize or 14, IconSize or 14),
-			Colors = { "Text" },
+			Size = UDim2.fromOffset(IconSize or 15, IconSize or 15),
+			Colors = { "Soft" },
 		})
 		local IconFrame = IconObject.IconFrame
 		IconFrame.Position = UDim2.fromScale(0.5, 0.5)
@@ -104,63 +201,34 @@ return function(Config)
 		end
 
 		Button.Frame = New("TextButton", {
-			Size = UDim2.new(0, 30, 1, -12),
-			AnchorPoint = Vector2.new(1, 0),
+			Size = UDim2.fromOffset(30, 30),
+			AnchorPoint = Vector2.new(1, 0.5),
+			Position = UDim2.new(1, -11 - (Index - 1) * 32, 0.5, 0),
 			BackgroundTransparency = 1,
 			Parent = Parent,
-			Position = Pos,
 			Text = "",
 			ThemeTag = {
-				BackgroundColor3 = "Text",
+				BackgroundColor3 = "Surface2",
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(1, 0), -- MD3 circular hover states
+				CornerRadius = UDim.new(0, 0),
 			}),
 			IconFrame,
 		})
 
-		local Motor, SetTransparency = Creator.SpringMotor(1, Button.Frame, "BackgroundTransparency")
+		AddSignal(Button.Frame.MouseEnter, function()
+			Button.Frame.BackgroundTransparency = 0
+			Creator.OverrideTag(IconFrame, { ImageColor3 = IsClose and "Danger" or "Text" })
+		end)
+		AddSignal(Button.Frame.MouseLeave, function()
+			Button.Frame.BackgroundTransparency = 1
+			Creator.OverrideTag(IconFrame, { ImageColor3 = "Soft" })
+		end)
 
-		if IsClose then
-			AddSignal(Button.Frame.MouseEnter, function()
-				Button.Frame.BackgroundColor3 = Color3.fromRGB(232, 17, 35)
-				Button.Frame.Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
-				SetTransparency(0)
-			end)
-			AddSignal(Button.Frame.MouseLeave, function()
-				SetTransparency(1, true)
-				task.delay(0.15, function()
-					if Button.Frame.BackgroundTransparency >= 0.99 then
-						Button.Frame.BackgroundColor3 = Creator.GetThemeProperty("Text")
-						Button.Frame.Icon.ImageColor3 = Creator.GetThemeProperty("Text")
-					end
-				end)
-			end)
-			AddSignal(Button.Frame.MouseButton1Down, function()
-				Button.Frame.BackgroundColor3 = Color3.fromRGB(175, 10, 25)
-				SetTransparency(0)
-			end)
-			AddSignal(Button.Frame.MouseButton1Up, function()
-				Button.Frame.BackgroundColor3 = Color3.fromRGB(232, 17, 35)
-				SetTransparency(0)
-			end)
-		else
-			AddSignal(Button.Frame.MouseEnter, function()
-				SetTransparency(0.92)
-			end)
-			AddSignal(Button.Frame.MouseLeave, function()
-				SetTransparency(1, true)
-			end)
-			AddSignal(Button.Frame.MouseButton1Down, function()
-				SetTransparency(0.88)
-			end)
-			AddSignal(Button.Frame.MouseButton1Up, function()
-				SetTransparency(0.92)
-			end)
-		end
-
-		AddSignal(Button.Frame.MouseButton1Click, Button.Callback)
+		AddSignal(Button.Frame.MouseButton1Click, function()
+			Button.Callback()
+		end)
 
 		Button.SetCallback = function(Func)
 			Button.Callback = Func
@@ -175,37 +243,31 @@ return function(Config)
 		Parent = Config.Parent,
 	}, {
 		New("Frame", {
-			Size = UDim2.new(1, -110, 1, 0),
-			Position = UDim2.new(0, 16, 0, 0),
+			Name = "Logo",
+			Size = UDim2.fromOffset(RailWidth, BarHeight),
+			BackgroundTransparency = 1,
+		}, {
+			Mark,
+		}),
+		New("Frame", {
+			Size = UDim2.new(1, -(RailWidth + 1 + 16 + 110), 1, 0),
+			Position = UDim2.fromOffset(RailWidth + 1 + 16, 0),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
 		}, {
 			New("UIListLayout", {
-				Padding = UDim.new(0, 10),
+				Padding = UDim.new(0, 8),
 				FillDirection = Enum.FillDirection.Horizontal,
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 			}),
-			New("Frame", {
-				Size = SubTitleBelow and UDim2.new(0, 0, 1, -4) or UDim2.new(0, 0, 1, 0),
-				AutomaticSize = Enum.AutomaticSize.X,
-				BackgroundTransparency = 1,
-			}, {
-				New("UIListLayout", {
-					Padding = UDim.new(0, SubTitleBelow and 2 or 6),
-					FillDirection = SubTitleBelow and Enum.FillDirection.Vertical or Enum.FillDirection.Horizontal,
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					VerticalAlignment = Enum.VerticalAlignment.Center,
-				}),
-				TitleBar.TitleLabel,
-				TitleBar.SubTitleLabel,
-
-			}),
-			TitleBar.TagsFrame,
-		})
+			TitleBar.TitleLabel,
+			TitleBar.CrumbSeparator,
+			TitleBar.CrumbLabel,
+		}),
 	})
 
-	TitleBar.CloseButton = BarButton("lucide:x", UDim2.new(1, -4, 0, 4), TitleBar.Frame, function()
+	TitleBar.CloseButton = BarButton("lucide:x", 1, TitleBar.Frame, function()
 		Library.Window:Dialog({
 			Title = "Close",
 			Content = "Are you sure you want to unload the interface?",
@@ -222,10 +284,10 @@ return function(Config)
 			},
 		})
 	end, true)
-	TitleBar.MaxButton = BarButton("lucide:square", UDim2.new(1, -38, 0, 4), TitleBar.Frame, function()
+	TitleBar.MaxButton = BarButton("lucide:square", 2, TitleBar.Frame, function()
 		Config.Window.Maximize(not Config.Window.Maximized)
-	end, false, 12)
-	TitleBar.MinButton = BarButton("lucide:minus", UDim2.new(1, -72, 0, 4), TitleBar.Frame, function()
+	end, false, 13)
+	TitleBar.MinButton = BarButton("lucide:minus", 3, TitleBar.Frame, function()
 		Library.Window:Minimize()
 	end)
 
@@ -264,13 +326,13 @@ return function(Config)
 			end
 		end
 
-		local Radius = math.clamp(Config.Radius or 4, 0, 10)
+		local Radius = Config.Radius or 0
 
 
 
 		local Children = {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, Radius),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			New("UIPadding", {
 				PaddingLeft = UDim.new(0, 6),
@@ -325,8 +387,8 @@ return function(Config)
 				LabelColor = TextColor
 				LabelThemeTag = nil
 			elseif UseTheme then
-				LabelColor = Creator.GetThemeProperty("Accent")
-				LabelThemeTag = { TextColor3 = "Accent" }
+				LabelColor = Creator.GetThemeProperty("Muted")
+				LabelThemeTag = { TextColor3 = "Muted" }
 			else
 				LabelColor = Color3.fromRGB(255, 255, 255)
 				LabelThemeTag = nil
@@ -335,12 +397,8 @@ return function(Config)
 
 		table.insert(Children, New("TextLabel", {
 			Text = Config.Title or "",
-			FontFace = Font.new(
-				"rbxassetid://12187372629",
-				Enum.FontWeight.Bold,
-				Enum.FontStyle.Normal
-			),
-			TextSize = 13,
+			FontFace = Creator.Fonts.Mono,
+			TextSize = 12,
 			TextColor3 = LabelColor,
 			ThemeTag = LabelThemeTag,
 			BackgroundTransparency = 1,
@@ -357,14 +415,18 @@ return function(Config)
 				Parent = self.TagsFrame,
 			}, Children)
 		elseif UseTheme then
-			-- Accent-tinted pill for default theme tags
+			-- Neutral chip for default theme tags
+			table.insert(Children, New("UIStroke", {
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				ThemeTag = {
+					Color = "Line",
+				},
+			}))
 			TagFrame = New("Frame", {
 				Size = UDim2.fromScale(0, 0),
 				AutomaticSize = Enum.AutomaticSize.XY,
-				BackgroundColor3 = Creator.GetThemeProperty("Accent"),
-				BackgroundTransparency = 0.85,
 				ThemeTag = {
-					BackgroundColor3 = "Accent",
+					BackgroundColor3 = "Surface",
 				},
 				Parent = self.TagsFrame,
 			}, Children)
@@ -517,6 +579,13 @@ return function(Config)
 		if self.TitleLabel then
 			self.TitleLabel.Text = Text
 		end
+	end
+
+	function TitleBar:SetCrumb(Text)
+		local Visible = Text ~= nil and Text ~= ""
+		self.CrumbLabel.Text = Text or ""
+		self.CrumbLabel.Visible = Visible
+		self.CrumbSeparator.Visible = Visible
 	end
 
 	function TitleBar:SetSubtitle(Text)

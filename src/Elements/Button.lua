@@ -23,7 +23,7 @@ function Element:New(Config)
 		local IconObject = Icons.Image({
 			Icon = IconValue,
 			Size = UDim2.fromOffset(16, 16),
-			Colors = { "Text" },
+			Colors = { "Soft" },
 		})
 		local IconFrame = IconObject.IconFrame
 

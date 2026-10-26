@@ -119,7 +119,8 @@ local buildMetrics = measure(function()
 		TabWidth = 140,
 		Size = UDim2.fromOffset(580, 460),
 		Acrylic = false,
-		Theme = "Dark",
+		Theme = "TWVZ",
+		Brand = "TWVZ",
 	})
 
 	local yieldingLeft = Settings.YieldingToggles

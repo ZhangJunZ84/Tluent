@@ -1,50 +1,17 @@
 return {
 	Name = "MidnightGold",
-	Accent = Color3.fromRGB(255, 180, 0), -- Honey amber gold
+	-- Midnight blue with an amber accent
+	Accent = Color3.fromHex("#ffb400"),
 
-	AcrylicMain = Color3.fromRGB(14, 14, 16), -- Deep charcoal obsidian base
-	AcrylicBorder = Color3.fromRGB(60, 55, 45), -- Warm bronze/amber steel border
-	AcrylicGradient = ColorSequence.new(Color3.fromRGB(24, 22, 18), Color3.fromRGB(10, 10, 11)), -- Dark bronze-to-black gradient
-	AcrylicNoise = 0.96, -- Clean sleek frosted grain
+	Background = Color3.fromHex("#0c0e16"),
+	Surface = Color3.fromHex("#13151c"),
+	Surface2 = Color3.fromHex("#1a1b22"),
+	Surface3 = Color3.fromHex("#212228"),
 
-	TitleBarLine = Color3.fromRGB(42, 38, 32), -- Soft bronze divider
-	Tab = Color3.fromRGB(255, 255, 255),
+	Line = Color3.fromHex("#1d1f25"),
+	Line2 = Color3.fromHex("#2a2b31"),
 
-	Element = Color3.fromRGB(255, 255, 255), -- Clean translucent highlighted cards
-	ElementBorder = Color3.fromRGB(32, 30, 26),
-	InElementBorder = Color3.fromRGB(75, 68, 55),
-	ElementTransparency = 0.95, -- Frosted high-transparency overlay
-
-	ToggleSlider = Color3.fromRGB(160, 150, 135),
-	ToggleToggled = Color3.fromRGB(255, 255, 255),
-
-	SliderRail = Color3.fromRGB(48, 44, 38),
-
-	DropdownFrame = Color3.fromRGB(255, 255, 255),
-	DropdownHolder = Color3.fromRGB(20, 20, 22),
-	DropdownBorder = Color3.fromRGB(42, 38, 32),
-	DropdownOption = Color3.fromRGB(255, 255, 255),
-
-	Keybind = Color3.fromRGB(255, 255, 255),
-
-	Input = Color3.fromRGB(255, 255, 255),
-	InputFocused = Color3.fromRGB(10, 10, 11),
-	InputIndicator = Color3.fromRGB(160, 150, 135),
-
-	Dialog = Color3.fromRGB(24, 22, 20),
-	DialogHolder = Color3.fromRGB(16, 16, 18),
-	DialogHolderLine = Color3.fromRGB(32, 30, 28),
-	DialogButton = Color3.fromRGB(32, 30, 28),
-	DialogButtonBorder = Color3.fromRGB(56, 52, 45),
-	DialogBorder = Color3.fromRGB(48, 44, 38),
-	DialogInput = Color3.fromRGB(18, 18, 20),
-	DialogInputLine = Color3.fromRGB(160, 150, 135),
-
-	Text = Color3.fromRGB(255, 255, 255), -- High contrast crisp white
-	SubText = Color3.fromRGB(160, 150, 135), -- Soft golden bronze-silver subtext
-	Hover = Color3.fromRGB(255, 255, 255),
-	HoverChange = 0.03,
-
-	SidebarBackground = Color3.fromRGB(14, 14, 16), -- Same as AcrylicMain — matches TitleBar
-	ContentBackground = Color3.fromRGB(22, 20, 18), -- Slightly lighter charcoal
+	Text = Color3.fromHex("#f1ede2"),
+	Muted = Color3.fromHex("#a19f9b"),
+	Soft = Color3.fromHex("#737272"),
 }

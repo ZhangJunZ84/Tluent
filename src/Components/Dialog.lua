@@ -25,7 +25,7 @@ function Dialog:Create()
 		Parent = Dialog.Window.Root,
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 	})
 
@@ -54,14 +54,10 @@ function Dialog:Create()
 	})
 
 	NewDialog.Title = New("TextLabel", {
-		FontFace = Font.new(
-			"rbxassetid://12187372629",
-			Enum.FontWeight.Bold,
-			Enum.FontStyle.Normal
-		),
+		FontFace = Creator.Fonts.SemiBold,
 		Text = "Dialog",
 		TextColor3 = Color3.fromRGB(240, 240, 240),
-		TextSize = 22,
+		TextSize = 17,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		Size = UDim2.new(1, 0, 0, 24),
 		Position = UDim2.fromOffset(24, 24),
@@ -85,16 +81,15 @@ function Dialog:Create()
 		GroupTransparency = 1,
 		Parent = NewDialog.TintFrame,
 		ThemeTag = {
-			BackgroundColor3 = "Dialog",
+			BackgroundColor3 = "Surface",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 		New("UIStroke", {
-			Transparency = 0.5,
 			ThemeTag = {
-				Color = "DialogBorder",
+				Color = "Line2",
 			},
 		}),
 		NewDialog.Scale,

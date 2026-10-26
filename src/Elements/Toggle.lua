@@ -20,49 +20,49 @@ function Element:New(Idx, Config)
 	}
 
 	local ToggleFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, true)
-	ToggleFrame.DescLabel.Size = UDim2.new(1, -54, 0, 14)
+	ToggleFrame.DescLabel.Size = UDim2.new(1, -54, 0, 15)
 
 	Toggle.SetTitle = ToggleFrame.SetTitle
 	Toggle.SetDesc = ToggleFrame.SetDesc
 
-	local ToggleCircle = New("Frame", {
+	local Knob = New("Frame", {
 		AnchorPoint = Vector2.new(0, 0.5),
-		Size = UDim2.fromOffset(16, 16),
-		Position = UDim2.new(0, 4, 0.5, 0),
-		BackgroundColor3 = Color3.new(1, 1, 1),
+		Size = UDim2.fromOffset(14, 14),
+		Position = UDim2.new(0, 3, 0.5, 0),
 		ThemeTag = {
-			BackgroundColor3 = "ToggleSlider",
+			BackgroundColor3 = "Muted",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		})
+			CornerRadius = UDim.new(0, 0),
+		}),
 	})
 
-	local ToggleBorder = New("UIStroke", {
-		Transparency = 0,
-		Thickness = 2,
+	local TrackStroke = New("UIStroke", {
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		ThemeTag = {
-			Color = "ToggleSlider",
+			Color = "Line2",
 		},
 	})
 
-	local ToggleSlider = New("Frame", {
-		Size = UDim2.fromOffset(44, 24),
+	local Track = New("Frame", {
+		Size = UDim2.fromOffset(34, 20),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
 		Parent = ToggleFrame.Frame,
-		BackgroundTransparency = 1,
 		ThemeTag = {
-			BackgroundColor3 = "Accent",
+			BackgroundColor3 = "Surface3",
 		},
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
+			CornerRadius = UDim.new(0, 0),
 		}),
-		ToggleBorder,
-		ToggleCircle,
+		TrackStroke,
+		Knob,
 	})
+
+	-- Set while the change comes from a click, so loading a config doesn't light every row up
+	local FromClick = false
 
 	function Toggle:OnChanged(Func)
 		Toggle.Changed = Func
@@ -73,22 +73,16 @@ function Element:New(Idx, Config)
 		Value = not not Value
 		Toggle.Value = Value
 
-		Creator.OverrideTag(ToggleBorder, { Color = Toggle.Value and "Accent" or "ToggleSlider" })
-		ToggleBorder.Transparency = Toggle.Value and 1 or 0
-		Creator.OverrideTag(ToggleCircle, { BackgroundColor3 = Toggle.Value and "ToggleToggled" or "ToggleSlider" })
-		
-		local circlePos = Toggle.Value and 24 or 4
-		
+		Creator.OverrideTag(Track, { BackgroundColor3 = Value and "Accent" or "Surface3" })
+		TrackStroke.Transparency = Value and 1 or 0
+		Creator.OverrideTag(Knob, { BackgroundColor3 = Value and "AccentInk" or "Muted" })
 		TweenService:Create(
-			ToggleCircle,
-			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-			{ Position = UDim2.new(0, circlePos, 0.5, 0), Size = UDim2.fromOffset(16, 16) }
+			Knob,
+			TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+			{ Position = UDim2.new(0, Value and 17 or 3, 0.5, 0) }
 		):Play()
-		TweenService:Create(
-			ToggleSlider,
-			TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
-			{ BackgroundTransparency = Toggle.Value and 0 or 1 }
-		):Play()
+
+		ToggleFrame:SetActive(Value, FromClick)
 
 		Library:SafeCallback(Toggle.Callback, Toggle.Value)
 		Library:SafeCallback(Toggle.Changed, Toggle.Value)
@@ -100,7 +94,9 @@ function Element:New(Idx, Config)
 	end
 
 	Creator.AddSignal(ToggleFrame.Frame.MouseButton1Click, function()
+		FromClick = true
 		Toggle:SetValue(not Toggle.Value)
+		FromClick = false
 	end)
 
 	Toggle:SetValue(Toggle.Value)

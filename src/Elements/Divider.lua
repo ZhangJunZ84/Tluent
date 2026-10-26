@@ -33,9 +33,8 @@ function Divider:New(Config)
 			Size = LineWidth,
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
-			BackgroundTransparency = 0.5,
 			ThemeTag = {
-				BackgroundColor3 = "TitleBarLine",
+				BackgroundColor3 = "Line",
 			},
 		})
 	})

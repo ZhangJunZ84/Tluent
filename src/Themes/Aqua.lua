@@ -1,50 +1,17 @@
 return {
 	Name = "Aqua",
-	Accent = Color3.fromRGB(0, 220, 200), -- Bright glowing electric turquoise
+	-- Deep teal with a turquoise accent
+	Accent = Color3.fromHex("#00dcc8"),
 
-	AcrylicMain = Color3.fromRGB(12, 22, 24), -- Deep sea obsidian base
-	AcrylicBorder = Color3.fromRGB(32, 64, 70), -- Translucent ocean steel border
-	AcrylicGradient = ColorSequence.new(Color3.fromRGB(20, 42, 46), Color3.fromRGB(8, 18, 20)), -- Smooth deep sea gradient
-	AcrylicNoise = 0.96, -- Less visible grain for cleaner frosted glass
+	Background = Color3.fromHex("#08161b"),
+	Surface = Color3.fromHex("#0f1d22"),
+	Surface2 = Color3.fromHex("#152328"),
+	Surface3 = Color3.fromHex("#1c2a2f"),
 
-	TitleBarLine = Color3.fromRGB(26, 52, 58),
-	Tab = Color3.fromRGB(255, 255, 255),
+	Line = Color3.fromHex("#19272c"),
+	Line2 = Color3.fromHex("#253338"),
 
-	Element = Color3.fromRGB(255, 255, 255), -- Clean translucent highlighted cards
-	ElementBorder = Color3.fromRGB(22, 45, 50),
-	InElementBorder = Color3.fromRGB(40, 80, 88),
-	ElementTransparency = 0.95, -- Frosted high-transparency overlay
-
-	ToggleSlider = Color3.fromRGB(140, 180, 185),
-	ToggleToggled = Color3.fromRGB(255, 255, 255),
-
-	SliderRail = Color3.fromRGB(30, 60, 66),
-
-	DropdownFrame = Color3.fromRGB(255, 255, 255),
-	DropdownHolder = Color3.fromRGB(16, 32, 36),
-	DropdownBorder = Color3.fromRGB(24, 48, 54),
-	DropdownOption = Color3.fromRGB(255, 255, 255),
-
-	Keybind = Color3.fromRGB(255, 255, 255),
-
-	Input = Color3.fromRGB(255, 255, 255),
-	InputFocused = Color3.fromRGB(10, 20, 22),
-	InputIndicator = Color3.fromRGB(140, 180, 185),
-
-	Dialog = Color3.fromRGB(18, 36, 40),
-	DialogHolder = Color3.fromRGB(12, 24, 28),
-	DialogHolderLine = Color3.fromRGB(22, 44, 50),
-	DialogButton = Color3.fromRGB(22, 44, 50),
-	DialogButtonBorder = Color3.fromRGB(38, 76, 85),
-	DialogBorder = Color3.fromRGB(32, 64, 70),
-	DialogInput = Color3.fromRGB(15, 30, 34),
-	DialogInputLine = Color3.fromRGB(140, 180, 185),
-
-	Text = Color3.fromRGB(255, 255, 255), -- High visibility white
-	SubText = Color3.fromRGB(145, 170, 175), -- Soft seafoam silver subtext
-	Hover = Color3.fromRGB(255, 255, 255),
-	HoverChange = 0.03,
-
-	SidebarBackground = Color3.fromRGB(12, 22, 24), -- Same as AcrylicMain — matches TitleBar
-	ContentBackground = Color3.fromRGB(18, 36, 40), -- Slightly lighter ocean
+	Text = Color3.fromHex("#e6f4f7"),
+	Muted = Color3.fromHex("#98a6aa"),
+	Soft = Color3.fromHex("#6c7a7e"),
 }

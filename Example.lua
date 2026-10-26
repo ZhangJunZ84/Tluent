@@ -5,13 +5,12 @@ local InterfaceManager = loadstring(game:HttpGet("http://localhost:8642/Addons/I
 local Window = Fluent:CreateWindow({
     Title = "Tluent Library",
     SubTitle = "Something",
-    SubTitlePosition = "Side", -- "Below" or "Side" (default)
-    TabStyle = "Tabs", -- "Tabs" or "Icons"
-    TabWidth = 120, -- Default: 120 for Tabs, 36 for Icons
     Size = UDim2.fromOffset(520, 400),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
     Transparency = false,
-    Theme = "Dark", -- You can use presets like Dark, Light, Aqua, etc.
+    Theme = "TWVZ", -- You can use presets like TWVZ, Dark, Light, Aqua, etc.
+    Brand = "TWVZ", -- Optional lockup in the header; or Logo = "rbxassetid://..." for an image
+    Accent = Color3.fromHex("#34d399"), -- Optional per-script accent on top of any theme
     MinimizeKey = Enum.KeyCode.LeftControl, -- Used when theres no MinimizeKeybind
     MinimizeButton = true, -- Creates a draggable minimize button on screen
 })
@@ -27,40 +26,20 @@ local Tabs = {
     IconTest = Window:AddTab({ 
         Title = "Icon Test", 
         Icon = "gravity:star-fill",
-        Badge = { Title = "NEW", Color = Color3.fromHex("#ffe59e") }
+        Badge = { Title = "NEW" }
     }),
-    Settings = Window:AddTab({ Title= "Settings", Icon = "gravity:gear" })
+    Settings = Window:AddTab({ Title = "Settings", Icon = "gravity:gear", Pinned = true })
 }
 
 local Options = Fluent.Options
 
 do
-    local VersionTag = Window:Tag({
+    -- Tags without a Color use the theme: a square neutral chip with the icon in the accent.
+    -- Pass Color (a Color3 or a ColorSequence) for a filled tag, or change it later with Tag:SetColor
+    Window:Tag({
         Title = Fluent.Version,
-        Icon = "info", -- Optional
-        Color = Color3.fromHex("#a1ff9e"), -- Optional, if not set, the color will be the same as the theme
+        Icon = "info",
     })
-
-    -- You can change the color of the tag with the `SetColor` method
-    -- And you can pass a ColorSequence too!
-    task.spawn(function()
-        while task.wait() do
-            if Fluent.Unloaded then break end
-            local Shift = os.clock() % 8 / 8
-            local Keypoints = {}
-            
-            for i = 0, 3 do
-                local RelativePos = i / 3
-                local Hue = (RelativePos - Shift) % 1
-                table.insert(Keypoints, ColorSequenceKeypoint.new(RelativePos, Color3.fromHSV(Hue, 0.6, 1)))
-            end
-            
-            VersionTag:SetColor({
-                Color = ColorSequence.new(Keypoints),
-                Rotation = 0
-            })
-        end
-    end)
 
     Window:Tag({
         Title = "TWVZ",

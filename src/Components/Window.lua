@@ -36,9 +36,12 @@ return function(Config)
 	local Resizing, ResizePos = false
 	local MinimizeNotif = false
 
+	local RailWidth = 52
+	local HeaderHeight = 44
+	local FooterHeight = 44
+	local BodyHeight = HeaderHeight + FooterHeight + 2
+
 	Window.AcrylicPaint = Acrylic.AcrylicPaint()
-	local DefaultTabWidth = Window.TabStyle == "Icons" and 36 or 120
-	Window.TabWidth = Config.TabWidth or DefaultTabWidth
 
 	local ResizeStartFrame = New("Frame", {
 		Size = UDim2.fromOffset(20, 20),
@@ -46,36 +49,87 @@ return function(Config)
 		Position = UDim2.new(1, -20, 1, -20),
 	})
 
+	local function Line(Size, Position)
+		return New("Frame", {
+			Size = Size,
+			Position = Position,
+			BorderSizePixel = 0,
+			ThemeTag = {
+				BackgroundColor3 = "Line",
+			},
+		})
+	end
+
+	-- Icon rail: one cell per tab, split by hairlines (Tab.lua adds them); scrolls when it overflows
 	Window.TabHolder = New("ScrollingFrame", {
-		Size = UDim2.fromScale(1, 1),
+		Size = UDim2.new(0, RailWidth, 1, -BodyHeight),
+		Position = UDim2.fromOffset(0, HeaderHeight + 1),
 		BackgroundTransparency = 1,
 		ScrollBarImageTransparency = 1,
 		ScrollBarThickness = 0,
 		BorderSizePixel = 0,
 		CanvasSize = UDim2.fromScale(0, 0),
+		AutomaticCanvasSize = Enum.AutomaticSize.Y,
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 	}, {
 		New("UIListLayout", {
-			Padding = UDim.new(0, 4),
+			SortOrder = Enum.SortOrder.LayoutOrder,
+		}),
+	})
+
+	-- Footer cell under the rail, for the tab added with Pinned = true (usually Settings)
+	Window.PinnedHolder = New("Frame", {
+		Size = UDim2.fromOffset(RailWidth, FooterHeight),
+		Position = UDim2.new(0, 0, 1, -FooterHeight),
+		BackgroundTransparency = 1,
+	})
+
+	Window.Footer = New("Frame", {
+		Size = UDim2.new(1, -(RailWidth + 1), 0, FooterHeight),
+		Position = UDim2.new(0, RailWidth + 1, 1, -FooterHeight),
+		BackgroundTransparency = 1,
+	})
+
+	Window.Tooltip = New("TextLabel", {
+		Text = "",
+		RichText = true,
+		FontFace = Creator.Fonts.Medium,
+		TextSize = 13,
+		Size = UDim2.fromOffset(0, 26),
+		AutomaticSize = Enum.AutomaticSize.X,
+		AnchorPoint = Vector2.new(1, 0.5),
+		Visible = false,
+		ZIndex = 20,
+		ThemeTag = {
+			BackgroundColor3 = "Surface2",
+			TextColor3 = "Text",
+		},
+	}, {
+		New("UICorner", {
+			CornerRadius = UDim.new(0, 0),
+		}),
+		New("UIStroke", {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			ThemeTag = {
+				Color = "Line2",
+			},
 		}),
 		New("UIPadding", {
-			PaddingLeft = UDim.new(0, 1),
-			PaddingRight = UDim.new(0, 1),
-			PaddingTop = UDim.new(0, 1),
-			PaddingBottom = UDim.new(0, 1),
+			PaddingLeft = UDim.new(0, 9),
+			PaddingRight = UDim.new(0, 9),
 		}),
 	})
 
-	local TabFrame = New("Frame", {
-		Size = UDim2.new(0, Window.TabWidth, 1, -(64 + BarOffset)),
-		Position = UDim2.new(0, 12, 0, 52 + BarOffset),
-		BackgroundTransparency = 1,
-		ClipsDescendants = true,
-	}, {
-		Window.TabHolder
-	})
+	function Window.ShowTooltip(Text, Anchor)
+		local Y = Anchor.AbsolutePosition.Y - Window.Root.AbsolutePosition.Y + Anchor.AbsoluteSize.Y / 2
+		Window.Tooltip.Text = Text
+		Window.Tooltip.Position = UDim2.fromOffset(-8, Y)
+		Window.Tooltip.Visible = true
+	end
 
-	-- TabDisplay removed: tab name is now rendered inside the scrollable content of each tab
+	function Window.HideTooltip()
+		Window.Tooltip.Visible = false
+	end
 
 	Window.ContainerHolder = New("Frame", {
 		Size = UDim2.fromScale(1, 1),
@@ -83,139 +137,12 @@ return function(Config)
 	})
 
 	Window.ContainerCanvas = New("Frame", {
-		Size = UDim2.new(1, -Window.TabWidth - 48, 1, -(40 + BarOffset)),
-		Position = UDim2.fromOffset(Window.TabWidth + 36, 40 + BarOffset),
+		Size = UDim2.new(1, -(RailWidth + 1), 1, -BodyHeight),
+		Position = UDim2.fromOffset(RailWidth + 1, HeaderHeight + 1),
 		BackgroundTransparency = 1,
 	}, {
-		Window.ContainerHolder
+		Window.ContainerHolder,
 	})
-
-	-- Shared indicator that slides along the sidebar left edge
-	Window.SidebarIndicator = New("Frame", {
-		Name = "SidebarIndicator",
-		Size = UDim2.fromOffset(3, 18),
-		Position = UDim2.fromOffset(0, 52 + BarOffset),
-		AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundTransparency = 1,
-		ZIndex = 4,
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		}),
-	})
-
-	-- Horizontal Divider under the Titlebar
-	local TitleBarDivider = New("Frame", {
-		Name = "TitleBarDivider",
-		Size = UDim2.new(1, 0, 0, 1),
-		Position = UDim2.new(0, 0, 0, 40),
-		BorderSizePixel = 0,
-		ThemeTag = {
-			BackgroundColor3 = "TitleBarLine",
-		},
-	})
-
-	-- Vertical Divider between Sidebar and Content
-	local SidebarDivider = New("Frame", {
-		Name = "SidebarDivider",
-		Size = UDim2.new(0, 1, 1, -40),
-		Position = UDim2.new(0, Window.TabWidth + 24, 0, 40),
-		BorderSizePixel = 0,
-		ThemeTag = {
-			BackgroundColor3 = "TitleBarLine",
-		},
-	})
-
-	-- Sidebar solid background (rounded bottom-left corner)
-	local SidebarBackground = New("Frame", {
-		Name = "SidebarBackground",
-		Size = UDim2.new(0, Window.TabWidth + 24, 1, -40),
-		Position = UDim2.new(0, 0, 0, 40),
-		BorderSizePixel = 0,
-		ThemeTag = {
-			BackgroundColor3 = "SidebarBackground",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
-		}),
-		-- Corner covers to make specific corners square instead of rounded
-		New("Frame", {
-			Name = "SidebarBackgroundCoverTopLeft",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.fromOffset(0, 0),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "SidebarBackground",
-			},
-		}),
-		New("Frame", {
-			Name = "SidebarBackgroundCoverTopRight",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.new(1, -8, 0, 0),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "SidebarBackground",
-			},
-		}),
-		New("Frame", {
-			Name = "SidebarBackgroundCoverBottomRight",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.new(1, -8, 1, -8),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "SidebarBackground",
-			},
-		}),
-	})
-	Window.SidebarBackground = SidebarBackground
-
-	-- Content solid background (rounded bottom-right corner)
-	local ContentBackground = New("Frame", {
-		Name = "ContentBackground",
-		Size = UDim2.new(1, -(Window.TabWidth + 25), 1, -40),
-		Position = UDim2.new(0, Window.TabWidth + 25, 0, 40),
-		BorderSizePixel = 0,
-		ThemeTag = {
-			BackgroundColor3 = "ContentBackground",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
-		}),
-		-- Corner covers to make specific corners square instead of rounded
-		New("Frame", {
-			Name = "ContentBackgroundCoverTopLeft",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.fromOffset(0, 0),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "ContentBackground",
-			},
-		}),
-		New("Frame", {
-			Name = "ContentBackgroundCoverBottomLeft",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.new(0, 0, 1, -8),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "ContentBackground",
-			},
-		}),
-		New("Frame", {
-			Name = "ContentBackgroundCoverTopRight",
-			Size = UDim2.fromOffset(8, 8),
-			Position = UDim2.new(1, -8, 0, 0),
-			BorderSizePixel = 0,
-			ThemeTag = {
-				BackgroundColor3 = "ContentBackground",
-			},
-		}),
-	})
-	Window.ContentBackground = ContentBackground
 
 	Window.Root = New("Frame", {
 		BackgroundTransparency = 1,
@@ -224,24 +151,34 @@ return function(Config)
 		Parent = Config.Parent,
 	}, {
 		Window.AcrylicPaint.Frame,
-		SidebarBackground,
-		ContentBackground,
-		TitleBarDivider,
-		SidebarDivider,
-		Window.SidebarIndicator,
+		Line(UDim2.new(0, 1, 1, 0), UDim2.fromOffset(RailWidth, 0)),
+		Line(UDim2.new(1, 0, 0, 1), UDim2.fromOffset(0, HeaderHeight)),
+		Line(UDim2.new(1, 0, 0, 1), UDim2.new(0, 0, 1, -(FooterHeight + 1))),
+		Window.TabHolder,
+		Window.PinnedHolder,
+		Window.Footer,
 		Window.ContainerCanvas,
-		TabFrame,
 		ResizeStartFrame,
+		Window.Tooltip,
 	})
-
 
 	Window.TitleBar = require(script.Parent.TitleBar)({
 		Title = Config.Title,
 		SubTitle = Config.SubTitle,
-		SubTitlePosition = Config.SubTitlePosition,
+		Brand = Config.Brand,
+		Logo = Config.Logo,
+		Height = HeaderHeight,
+		RailWidth = RailWidth,
 		Parent = Window.Root,
 		Window = Window,
 	})
+
+	-- Footer: subtitle on the left, tags on the right (clear of the resize grip)
+	Window.TitleBar.SubTitleLabel.Position = UDim2.fromOffset(16, 0)
+	Window.TitleBar.SubTitleLabel.Parent = Window.Footer
+	Window.TitleBar.TagsFrame.AnchorPoint = Vector2.new(1, 0.5)
+	Window.TitleBar.TagsFrame.Position = UDim2.new(1, -22, 0.5, 0)
+	Window.TitleBar.TagsFrame.Parent = Window.Footer
 
 	if require(Root).UseAcrylic then
 		Window.AcrylicPaint.AddParent(Window.Root)
@@ -377,10 +314,6 @@ return function(Config)
 		end
 	end)
 
-	Creator.AddSignal(Window.TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-		Window.TabHolder.CanvasSize = UDim2.new(0, 0, 0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y)
-	end)
-
 	Creator.AddSignal(UserInputService.InputBegan, function(Input)
 		if Input.UserInputType ~= Enum.UserInputType.Keyboard then return end
 		if UserInputService:GetFocusedTextBox() then return end
@@ -469,7 +402,7 @@ return function(Config)
 			frame.Parent = screenGui
 
 			local uiCorner = Instance.new("UICorner")
-			uiCorner.CornerRadius = UDim.new(0, 8)
+			uiCorner.CornerRadius = UDim.new(0, 0)
 			uiCorner.Parent = frame
 
 			local uiStroke = Instance.new("UIStroke")
@@ -628,14 +561,10 @@ return function(Config)
 		Dialog.Title.Text = Config.Title
 
 		local Content = New("TextLabel", {
-			FontFace = Font.new(
-				"rbxassetid://12187372629",
-				Enum.FontWeight.Regular,
-				Enum.FontStyle.Normal
-			),
+			FontFace = Creator.Fonts.Regular,
 			Text = Config.Content,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
-			TextSize = 16,
+			TextSize = 14,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextYAlignment = Enum.TextYAlignment.Top,
 			Size = UDim2.new(1, -48, 1, 0),
@@ -644,7 +573,7 @@ return function(Config)
 			Parent = Dialog.Root,
 			ClipsDescendants = false,
 			ThemeTag = {
-				TextColor3 = "SubText", -- MD3 Body uses OnSurfaceVariant (SubText)
+				TextColor3 = "Muted",
 			},
 		})
 
@@ -683,7 +612,8 @@ return function(Config)
 
 	local TabModule = require(Components.Tab):Init(Window)
 	function Window:AddTab(TabConfig)
-		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder, TabConfig)
+		local Parent = TabConfig.Pinned and Window.PinnedHolder or Window.TabHolder
+		local Tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Parent, TabConfig)
 		if TabConfig.Badge then
 			Tab:AddBadge(TabConfig.Badge)
 		end

@@ -49,12 +49,12 @@ function Element:New(Idx, Config)
 		Parent = ColorpickerFrame.Frame,
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
 		}),
 	})
 
 	local DisplayFrame = New("ImageLabel", {
-		Size = UDim2.fromOffset(26, 26),
+		Size = UDim2.fromOffset(32, 22),
 		Position = UDim2.new(1, -10, 0.5, 0),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Parent = ColorpickerFrame.Frame,
@@ -64,7 +64,13 @@ function Element:New(Idx, Config)
 		TileSize = UDim2.fromOffset(40, 40),
 	}, {
 		New("UICorner", {
-			CornerRadius = UDim.new(0, 8),
+			CornerRadius = UDim.new(0, 0),
+		}),
+		New("UIStroke", {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			ThemeTag = {
+				Color = "Line2",
+			},
 		}),
 		DisplayFrameColor,
 	})
@@ -87,11 +93,7 @@ function Element:New(Idx, Config)
 
 		local function CreateInputLabel(Text, Pos)
 			return New("TextLabel", {
-				FontFace = Font.new(
-					"rbxasset://fonts/families/Roboto.json",
-					Enum.FontWeight.Medium,
-					Enum.FontStyle.Normal
-				),
+				FontFace = Creator.Fonts.Medium,
 				Text = Text,
 				TextColor3 = Color3.fromRGB(240, 240, 240),
 				TextSize = 14,
@@ -128,7 +130,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			SatCursor,
 		})
@@ -139,7 +141,7 @@ function Element:New(Idx, Config)
 			BackgroundTransparency = Colorpicker.Transparency,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 		})
 
@@ -154,7 +156,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			New("UIStroke", {
 				Thickness = 2,
@@ -169,7 +171,7 @@ function Element:New(Idx, Config)
 			BackgroundTransparency = 0,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 		})
 
@@ -184,7 +186,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 8),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			New("UIStroke", {
 				Thickness = 2,
@@ -215,7 +217,7 @@ function Element:New(Idx, Config)
 			Image = "http://www.roblox.com/asset/?id=12266946128",
 			Parent = HueDragHolder,
 			ThemeTag = {
-				ImageColor3 = "DialogInput",
+				ImageColor3 = "Surface3",
 			},
 		})
 
@@ -225,7 +227,7 @@ function Element:New(Idx, Config)
 			Parent = Dialog.Root,
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(1, 0),
+				CornerRadius = UDim.new(0, 0),
 			}),
 			HueSliderGradient,
 			HueDragHolder,
@@ -267,7 +269,7 @@ function Element:New(Idx, Config)
 				Image = "http://www.roblox.com/asset/?id=12266946128",
 				Parent = TransparencyDragHolder,
 				ThemeTag = {
-					ImageColor3 = "DialogInput",
+					ImageColor3 = "Surface3",
 				},
 			})
 
@@ -282,7 +284,7 @@ function Element:New(Idx, Config)
 					Rotation = 270,
 				}),
 				New("UICorner", {
-					CornerRadius = UDim.new(1, 0),
+					CornerRadius = UDim.new(0, 0),
 				}),
 			})
 
@@ -293,7 +295,7 @@ function Element:New(Idx, Config)
 				BackgroundTransparency = 1,
 			}, {
 				New("UICorner", {
-					CornerRadius = UDim.new(1, 0),
+					CornerRadius = UDim.new(0, 0),
 				}),
 				New("ImageLabel", {
 					Image = "http://www.roblox.com/asset/?id=14204231522",
@@ -305,7 +307,7 @@ function Element:New(Idx, Config)
 					Parent = Dialog.Root,
 				}, {
 					New("UICorner", {
-						CornerRadius = UDim.new(1, 0),
+						CornerRadius = UDim.new(0, 0),
 					}),
 				}),
 				TransparencyColor,

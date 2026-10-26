@@ -29,7 +29,7 @@ function Element:New(Idx, Config)
 	local Dragging = false
 
 	local SliderFrame = require(Components.Element)(Config.Title, Config.Description, self.Container, false)
-	SliderFrame.DescLabel.Size = UDim2.new(1, -170, 0, 14)
+	SliderFrame.DescLabel.Size = UDim2.new(1, -210, 0, 15)
 
 	Slider.SetTitle = SliderFrame.SetTitle
 	Slider.SetDesc = SliderFrame.SetDesc
@@ -44,13 +44,23 @@ function Element:New(Idx, Config)
 		ZIndex = 5,
 	})
 
+	-- Thumb: light dot ringed with the window background so it reads over the fill
 	local SliderDot = New("Frame", {
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, -10, 0.5, 0),
-		Size = UDim2.fromOffset(20, 20),
-		BackgroundColor3 = Color3.new(1, 1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0, 0.5),
+		Size = UDim2.fromOffset(12, 12),
+		ZIndex = 3,
+		ThemeTag = {
+			BackgroundColor3 = "Text",
+		},
 	}, {
-		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+		New("UICorner", { CornerRadius = UDim.new(0, 0) }),
+		New("UIStroke", {
+			Thickness = 3,
+			ThemeTag = {
+				Color = "Background",
+			},
+		}),
 		SoccerBallLabel,
 	})
 
@@ -59,76 +69,73 @@ function Element:New(Idx, Config)
 			local isBrasil = (Library.Theme == "Brasil")
 			SoccerBallLabel.Visible = isBrasil
 			SliderDot.BackgroundTransparency = isBrasil and 1 or 0
-			SliderDot.Size = isBrasil and UDim2.fromOffset(24, 24) or UDim2.fromOffset(20, 20)
-			SliderDot.BackgroundColor3 = GetTheme("Accent")
+			SliderDot.Size = isBrasil and UDim2.fromOffset(22, 22) or UDim2.fromOffset(12, 12)
+			SliderDot.BackgroundColor3 = GetTheme("Text")
 		end,
+	})
+
+	local SliderFill = New("Frame", {
+		Size = UDim2.fromScale(0, 1),
+		ThemeTag = {
+			BackgroundColor3 = "Accent",
+		},
+	}, {
+		New("UICorner", { CornerRadius = UDim.new(0, 0) }),
+	})
+
+	local SliderRail = New("Frame", {
+		Size = UDim2.new(1, -44, 0, 4),
+		Position = UDim2.fromScale(0, 0.5),
+		AnchorPoint = Vector2.new(0, 0.5),
+		ThemeTag = {
+			BackgroundColor3 = "Surface3",
+		},
+	}, {
+		New("UICorner", { CornerRadius = UDim.new(0, 0) }),
+		SliderFill,
+		SliderDot,
 	})
 
 	local SliderHitbox = New("TextButton", {
 		BackgroundTransparency = 1,
 		Text = "",
-		Size = UDim2.new(1, 0, 1, 20),
-		Position = UDim2.fromOffset(0, -10),
+		Size = UDim2.new(1, -44, 1, 16),
+		Position = UDim2.fromOffset(0, -8),
 		AutoButtonColor = false,
-	})
-
-	local SliderRail = New("Frame", {
-		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(7, 0),
-		Size = UDim2.new(1, -14, 1, 0),
-	}, {
-		SliderDot,
-		SliderHitbox,
-	})
-
-	local SliderFill = New("Frame", {
-		Size = UDim2.new(0, 0, 1, 0),
-		ThemeTag = {
-			BackgroundColor3 = "Accent",
-		},
-	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		}),
+		ZIndex = 4,
 	})
 
 	local SliderDisplay = New("TextBox", {
-		FontFace = Font.new("rbxassetid://12187372629", Enum.FontWeight.Bold),
+		FontFace = Creator.Fonts.Mono,
 		Text = "Value",
-		TextSize = 16,
-		TextWrapped = true,
+		TextSize = 12,
 		TextXAlignment = Enum.TextXAlignment.Right,
-		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 		BackgroundTransparency = 1,
-		Size = UDim2.new(0, 100, 0, 14),
-		Position = UDim2.new(0, -4, 0.5, 0),
-		AnchorPoint = Vector2.new(1, 0.5),
+		Size = UDim2.new(0, 36, 1, 0),
+		Position = UDim2.fromScale(1, 0),
+		AnchorPoint = Vector2.new(1, 0),
 		ClearTextOnFocus = false,
 		ThemeTag = {
-			TextColor3 = "SubText",
+			TextColor3 = "Text",
 		},
 	})
 
-	local SliderInner = New("Frame", {
-		Size = UDim2.new(1, 0, 0, 6),
+	New("Frame", {
+		Size = UDim2.new(0, 190, 0, 16),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -10, 0.5, 0),
-		BackgroundTransparency = 0,
+		BackgroundTransparency = 1,
 		Parent = SliderFrame.Frame,
-		ThemeTag = {
-			BackgroundColor3 = "SliderRail",
-		},
 	}, {
-		New("UICorner", {
-			CornerRadius = UDim.new(1, 0),
-		}),
-		New("UISizeConstraint", {
-			MaxSize = Vector2.new(150, math.huge),
-		}),
-		SliderDisplay,
-		SliderFill,
 		SliderRail,
+		SliderHitbox,
+		SliderDisplay,
 	})
+
+	local function ValueFromInput(Input)
+		local SizeScale = math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
+		return Slider.Min + ((Slider.Max - Slider.Min) * SizeScale)
+	end
 
 	Creator.AddSignal(SliderHitbox.InputBegan, function(Input)
 		if
@@ -136,18 +143,7 @@ function Element:New(Idx, Config)
 			or Input.UserInputType == Enum.UserInputType.Touch
 		then
 			Dragging = true
-			local SizeScale =
-				math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
-			Slider:SetValue(Slider.Min + ((Slider.Max - Slider.Min) * SizeScale))
-		end
-	end)
-
-	Creator.AddSignal(SliderDot.InputBegan, function(Input)
-		if
-			Input.UserInputType == Enum.UserInputType.MouseButton1
-			or Input.UserInputType == Enum.UserInputType.Touch
-		then
-			Dragging = true
+			Slider:SetValue(ValueFromInput(Input))
 		end
 	end)
 
@@ -168,9 +164,7 @@ function Element:New(Idx, Config)
 				or Input.UserInputType == Enum.UserInputType.Touch
 			)
 		then
-			local SizeScale =
-				math.clamp((Input.Position.X - SliderRail.AbsolutePosition.X) / SliderRail.AbsoluteSize.X, 0, 1)
-			Slider:SetValue(Slider.Min + ((Slider.Max - Slider.Min) * SizeScale))
+			Slider:SetValue(ValueFromInput(Input))
 		end
 	end)
 
@@ -190,16 +184,12 @@ function Element:New(Idx, Config)
 
 	function Slider:SetValue(Value)
 		self.Value = Library:Round(math.clamp(Value, Slider.Min, Slider.Max), Slider.Rounding)
-		
-		local isBrasil = (Library.Theme == "Brasil")
-		local offset = isBrasil and -12 or -10
-		SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), offset, 0.5, 0)
-		
-		SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
-		SliderDisplay.Text = tostring(self.Value)
 
-		local percent = (self.Value - Slider.Min) / (Slider.Max - Slider.Min)
-		SoccerBallLabel.Rotation = percent * 360 * 3
+		local Percent = (self.Value - Slider.Min) / (Slider.Max - Slider.Min)
+		SliderDot.Position = UDim2.fromScale(Percent, 0.5)
+		SliderFill.Size = UDim2.fromScale(Percent, 1)
+		SliderDisplay.Text = tostring(self.Value)
+		SoccerBallLabel.Rotation = Percent * 360 * 3
 
 		Library:SafeCallback(Slider.Callback, self.Value)
 		Library:SafeCallback(Slider.Changed, self.Value)

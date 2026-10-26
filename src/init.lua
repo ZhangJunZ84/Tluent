@@ -18,7 +18,7 @@ ProtectGui(GUI)
 NotificationModule:Init(GUI)
 
 local Library = {
-	Version = "0.0.2",
+	Version = "0.2.0",
 
 	OpenFrames = {},
 	Options = {},
@@ -27,7 +27,8 @@ local Library = {
 	Window = nil,
 	Unloaded = false,
 
-	Theme = "Dark",
+	Theme = "TWVZ",
+	AccentColor = nil,
 	DialogOpen = false,
 	UseAcrylic = false,
 	Acrylic = false,
@@ -110,7 +111,8 @@ function Library:CreateWindow(Config)
 	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
 	Library.UseAcrylic = Config.Acrylic or false
 	Library.Acrylic = Config.Acrylic or false
-	Library.Theme = Config.Theme or "Dark"
+	Library.Theme = Config.Theme or "TWVZ"
+	Library.AccentColor = Config.Accent
 
 	Library.Transparency = Config.Transparency or false
 	if Config.Acrylic then
@@ -128,6 +130,8 @@ function Library:CreateWindow(Config)
 		MinimizeButton = Config.MinimizeButton or false,
 		MinimizeButtonImage = Config.MinimizeButtonImage,
 		MinimizeButtonSize = Config.MinimizeButtonSize,
+		Brand = Config.Brand,
+		Logo = Config.Logo,
 	})
 
 	Library.Window = Window
@@ -139,7 +143,19 @@ end
 
 function Library:SetTheme(Value)
 	if Library.Window and table.find(Library.Themes, Value) then
+		-- The script's accent belongs to the theme it started with; another theme brings its own
+		if Value ~= Library.Theme then
+			Library.AccentColor = nil
+		end
 		Library.Theme = Value
+		Creator.UpdateTheme()
+	end
+end
+
+-- Per-script accent color on top of any theme; nil returns to the theme's own accent
+function Library:SetAccent(Color)
+	Library.AccentColor = Color
+	if Library.Window then
 		Creator.UpdateTheme()
 	end
 end
